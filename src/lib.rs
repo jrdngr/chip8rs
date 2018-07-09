@@ -1,6 +1,8 @@
 extern crate wasm_bindgen;
 
 pub mod cpu;
+pub mod interpreter;
+pub mod opcode;
 
 use wasm_bindgen::prelude::*;
 
