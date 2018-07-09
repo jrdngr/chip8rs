@@ -41,17 +41,28 @@ impl From<u16> for OpCode {
     fn from(value: u16) -> Self {
         let (path, x, y, n) = get_hex_digits(value);
         match path {
-            0 => {
+            0x0 => {
                 match value {
                     0x00E0 => OpCode::ClearScreen,
                     0x00EE => OpCode::ReturnFromSubroutine,
-                    _ => OpCode::ExecuteMachineSubroutine(value & 0x0FFF),
+                    _ => OpCode::ExecuteMachineSubroutine(get_last_12_bits(value)),
                 }
             },
-            1 => OpCode::JumpTo(value & 0x0FFF),
-            2 => OpCode::ExecuteSubroutine(value & 0x0FFF),
-            3 => OpCode::SkipIfEqualValue(x, value & 0x00FF),
-            4 => OpCode::SkipIfNotEqualValue(x, value & 0x00FF),
+            0x1 => OpCode::JumpTo(get_last_12_bits(value)),
+            0x2 => OpCode::ExecuteSubroutine(get_last_12_bits(value)),
+            0x3 => OpCode::SkipIfEqualValue(x, get_last_byte(value)),
+            0x4 => OpCode::SkipIfNotEqualValue(x, get_last_byte(value)),
+            0x5 => OpCode::SkipIfEqualRegister(x, y),
+            0x6 => OpCode::StoreValue(x, get_last_byte(value)),
+            0x7 => OpCode::AddValue(x, get_last_byte(value)),
+            0x8 => match n {
+                _ => panic!("{} is not a valid opcode", value),
+            },
+            0x9 => OpCode::SkipIfNotEqualRegister(x, y),
+            0xA => OpCode::StoreInI(get_last_12_bits(value)),
+            0xB => OpCode::JumpWithOffset(get_last_12_bits(value)),
+            0xC => OpCode::SetToRandom(x, get_last_byte(value)),
+            0xD => OpCode::DrawSprite(x, y, n),
             _ => panic!("{} is not a valid opcode", value),
         }
     }
@@ -59,6 +70,18 @@ impl From<u16> for OpCode {
 
 fn get_hex_digits(value: u16) -> (u8, u8, u8, u8) {
     (((value & 0xF000) >> 12) as u8, ((value & 0x0F00) >> 8) as u8, ((value & 0x00F0) >> 4) as u8, (value & 0x000F) as u8)
+}
+
+fn get_first_byte(value: u16) -> u8 {
+    ((value & 0xFF00) >> 8) as u8
+}
+
+fn get_last_byte(value: u16) -> u8 {
+    (value & 0x00FF) as u8
+}
+
+fn get_last_12_bits(value: u16) -> u16 {
+    value & 0x0FFF
 }
 
 
