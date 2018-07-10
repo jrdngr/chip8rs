@@ -1,12 +1,11 @@
 extern crate wasm_bindgen;
 
 pub mod cpu;
-pub mod interpreter;
 pub mod opcode;
+pub mod graphics;
+pub mod keyboard;
 
 use wasm_bindgen::prelude::*;
-
-
 
 #[cfg(test)]
 mod tests {

@@ -1,4 +1,5 @@
 use super::opcode::{ OpCode };
+use super::graphics::{ Screen };
 
 pub struct Cpu {
     program_counter: usize,
@@ -9,6 +10,7 @@ pub struct Cpu {
     data_registers: [u8; 16],
     stack: [usize; 16],
     ram: [u8; 4096],
+    screen: Screen,
 }
 
 impl Cpu {
@@ -22,6 +24,7 @@ impl Cpu {
             data_registers: [0; 16],
             stack: [0; 16],
             ram: [0; 4096],
+            screen: Screen::new(),
         }
     }
 
@@ -29,7 +32,7 @@ impl Cpu {
         match opcode {
             OpCode::ExecuteMachineSubroutine(nnn) => { /* Not implemented */ },
             OpCode::ClearScreen => {   
-                
+                self.screen.clear();
             },
             OpCode::ReturnFromSubroutine => {   
                 self.program_counter = self.stack[self.stack_pointer];
@@ -115,7 +118,6 @@ impl Cpu {
                 let vy = self.data_registers[y as usize];
                 self.data_registers[15] = (vy >> 7) & 1;
                 self.data_registers[x as usize] = vy << 1;
-
             },
             OpCode::SkipIfNotEqualRegister(x, y) => {   
                 let vx = self.data_registers[x as usize];
@@ -135,7 +137,7 @@ impl Cpu {
 
             },
             OpCode::DrawSprite(x, y, n) => {   
-
+                self.screen.draw_sprite(x, y, n);
             },
             OpCode::SkipIfKeyPressed(x) => {   
 
@@ -158,17 +160,27 @@ impl Cpu {
             OpCode::AddToRegisterI(x) => { 
                 self.i_register += self.data_registers[x as usize] as usize; 
             },
-            OpCode::SetIToSprite(x) => { 
+            OpCode::SetIToHexSprite(x) => { 
 
             },
             OpCode::StoreDecimal(x) => {   
+                let vx = self.data_registers[x as usize];
+                self.ram[self.i_register] = vx / 100;
+                self.ram[self.i_register + 1] = (vx / 10) % 10;
+                self.ram[self.i_register + 2] = vx % 10;
 
             },
             OpCode::StoreRegisters(x) => {   
-
+               for address in 0..x {
+                   self.ram[self.i_register] = self.data_registers[address as usize];
+                   self.i_register += 1;
+               } 
             },
             OpCode::FillRegisters(x) => {   
-
+               for register in 0..x {
+                   self.data_registers[register as usize] = self.ram[self.i_register];
+                   self.i_register += 1;
+               } 
             },
         }
     }

@@ -31,7 +31,7 @@ pub enum OpCode {
     SetDelayTimer(u8),              // FX15
     SetSoundTimer(u8),              // FX18
     AddToRegisterI(u8),             // FX1E
-    SetIToSprite(u8),               // FX29
+    SetIToHexSprite(u8),            // FX29
     StoreDecimal(u8),               // FX33
     StoreRegisters(u8),             // FX55
     FillRegisters(u8),              // FX65
@@ -87,7 +87,7 @@ impl From<u16> for OpCode {
                 0x15 => OpCode::SetDelayTimer(x),
                 0x18 => OpCode::SetSoundTimer(x),
                 0x1E => OpCode::AddToRegisterI(x),
-                0x29 => OpCode::SetIToSprite(x),
+                0x29 => OpCode::SetIToHexSprite(x),
                 0x33 => OpCode::StoreDecimal(x),
                 0x55 => OpCode::StoreRegisters(x),
                 0x65 => OpCode::FillRegisters(x),
@@ -152,7 +152,7 @@ mod tests {
         assert_eq!(OpCode::from(0xF115), OpCode::SetDelayTimer(1));
         assert_eq!(OpCode::from(0xF118), OpCode::SetSoundTimer(1));
         assert_eq!(OpCode::from(0xF11E), OpCode::AddToRegisterI(1));
-        assert_eq!(OpCode::from(0xF129), OpCode::SetIToSprite(1));
+        assert_eq!(OpCode::from(0xF129), OpCode::SetIToHexSprite(1));
         assert_eq!(OpCode::from(0xF133), OpCode::StoreDecimal(1));
         assert_eq!(OpCode::from(0xF155), OpCode::StoreRegisters(1));
         assert_eq!(OpCode::from(0xF165), OpCode::FillRegisters(1));
