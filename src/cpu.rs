@@ -1,20 +1,20 @@
 use super::opcode::{ OpCode };
 
 pub struct Cpu {
-    program_counter: u16,
-    stack_pointer: u8,
+    program_counter: usize,
+    stack_pointer: usize,
     delay_timer: u8,
     sound_timer: u8,
-    i_register: u16,
+    i_register: usize,
     data_registers: [u8; 16],
-    stack: [u16; 16],
+    stack: [usize; 16],
     ram: [u8; 4096],
 }
 
 impl Cpu {
     pub fn new() -> Self {
         Cpu {
-            program_counter: 0,
+            program_counter: 200,
             stack_pointer: 0,
             delay_timer: 0,
             sound_timer: 0,
@@ -32,22 +32,34 @@ impl Cpu {
                 
             },
             OpCode::ReturnFromSubroutine => {   
-
+                self.program_counter = self.stack[self.stack_pointer];
+                self.stack_pointer -= 1;
             },
             OpCode::JumpTo(nnn) => {   
-
+                self.program_counter = nnn;
             },
             OpCode::ExecuteSubroutine(nnn) => {   
-
+                self.stack[self.stack_pointer] = self.program_counter;
+                self.program_counter = nnn;
             },
             OpCode::SkipIfEqualValue(x, nn) => {   
-
+                let vx = self.data_registers[x as usize];
+                if vx == nn {
+                    self.program_counter += 1;
+                }
             },
             OpCode::SkipIfNotEqualValue(x, nn) => {   
-
+                let vx = self.data_registers[x as usize];
+                if vx != nn {
+                    self.program_counter += 1;
+                }
             },
             OpCode::SkipIfEqualRegister(x, y) => {   
-
+                let vx = self.data_registers[x as usize];
+                let vy = self.data_registers[y as usize];
+                if vx == vy {
+                    self.program_counter += 1;
+                }
             },
             OpCode::StoreValue(x, nn) => { 
                 self.data_registers[x as usize] = nn; 
@@ -106,13 +118,18 @@ impl Cpu {
 
             },
             OpCode::SkipIfNotEqualRegister(x, y) => {   
-
+                let vx = self.data_registers[x as usize];
+                let vy = self.data_registers[y as usize];
+                if vx != vy {
+                    self.program_counter += 1;
+                }
             },
             OpCode::StoreInI(nnn) => { 
                 self.i_register = nnn 
             },
             OpCode::JumpWithOffset(nnn) => {   
-
+                let offset = self.data_registers[0] as usize;
+                self.program_counter = nnn + offset;
             },
             OpCode::SetToRandom(x, nn) => {   
 
@@ -139,7 +156,7 @@ impl Cpu {
                 self.sound_timer = self.data_registers[x as usize]; 
             },
             OpCode::AddToRegisterI(x) => { 
-                self.i_register += self.data_registers[x as usize] as u16; 
+                self.i_register += self.data_registers[x as usize] as usize; 
             },
             OpCode::SetIToSprite(x) => { 
 

@@ -1,10 +1,10 @@
 #[derive(Debug, PartialEq)]
 pub enum OpCode {
-    ExecuteMachineSubroutine(u16),  // 0NNN
+    ExecuteMachineSubroutine(usize),// 0NNN
     ClearScreen,                    // 00E0
     ReturnFromSubroutine,           // 00EE
-    JumpTo(u16),                    // 1NNN
-    ExecuteSubroutine(u16),         // 2NNN
+    JumpTo(usize),                  // 1NNN
+    ExecuteSubroutine(usize),       // 2NNN
     SkipIfEqualValue(u8, u8),       // 3XNN
     SkipIfNotEqualValue(u8, u8),    // 4XNN
     SkipIfEqualRegister(u8, u8),    // 5XY0
@@ -20,8 +20,8 @@ pub enum OpCode {
     SubtractRegisterReverse(u8, u8),// 8XY7
     ShiftLeft(u8, u8),              // 8XYE
     SkipIfNotEqualRegister(u8, u8), // 9XY0
-    StoreInI(u16),                  // ANNN
-    JumpWithOffset(u16),            // BNNN
+    StoreInI(usize),                // ANNN
+    JumpWithOffset(usize),          // BNNN
     SetToRandom(u8, u8),            // CXNN
     DrawSprite(u8, u8, u8),         // DXYN
     SkipIfKeyPressed(u8),           // EX9E
@@ -110,8 +110,8 @@ fn get_last_byte(value: u16) -> u8 {
     (value & 0x00FF) as u8
 }
 
-fn get_last_12_bits(value: u16) -> u16 {
-    value & 0x0FFF
+fn get_last_12_bits(value: u16) -> usize {
+    (value & 0x0FFF) as usize
 }
 
 
