@@ -15,10 +15,11 @@ mod tests {
     use super::*;
 
     #[test]
-    fn testris() {
-        let mut f = File::open("tetris.ch8").expect("File not found");
+    fn breakout() {
+        let mut f = File::open("breakout.ch8").expect("File not found");
         let mut buffer = Vec::new();
         f.read_to_end(&mut buffer).expect("Error reading file");
+        println!("buffer: {}", buffer.len());
 
         let mut cpu = cpu::Cpu::new();
         cpu.load(&buffer);

@@ -39,7 +39,6 @@ pub enum OpCode {
 
 impl From<u16> for OpCode {
     fn from(value: u16) -> Self {
-        println!("ocv-{}", value);
         let (path, x, y, n) = get_hex_digits(value);
         match path {
             0x0 => {
@@ -163,7 +162,6 @@ mod tests {
     #[should_panic]
     fn test_invalid_opcodes() {
         let op = OpCode::from(0x5EE1);
-        println!("{:?}", op);
     }
 
     #[test]
