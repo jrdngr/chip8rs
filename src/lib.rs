@@ -9,8 +9,19 @@ use wasm_bindgen::prelude::*;
 
 #[cfg(test)]
 mod tests {
+    use std::env;
+    use std::fs::File;
+    use std::io::prelude::*;
+    use super::*;
+
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    fn testris() {
+        let mut f = File::open("tetris.ch8").expect("File not found");
+        let mut buffer = Vec::new();
+        f.read_to_end(&mut buffer).expect("Error reading file");
+
+        let mut cpu = cpu::Cpu::new();
+        cpu.load(&buffer);
+        cpu.start();
     }
 }

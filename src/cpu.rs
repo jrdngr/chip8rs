@@ -28,6 +28,32 @@ impl Cpu {
         }
     }
 
+    pub fn load(&mut self, rom: &Vec<u8>) {
+        for (offset, byte) in rom.iter().enumerate() {
+            self.ram[200 + offset] = *byte;
+        }
+    }
+
+    pub fn start(&mut self) {
+        let max = self.ram.len() - 1;
+        while self.program_counter < max {
+            let next_op = self.get_current_opcode();
+            self.program_counter += 2;
+            if let OpCode::ExecuteMachineSubroutine(n) = next_op {
+                continue;
+            } else {
+                println!("--{:?}", next_op);
+                self.process_opcode(next_op);
+            }
+        }
+    }
+
+    fn get_current_opcode(&self) -> OpCode {
+        let first_byte = (self.ram[self.program_counter] as u16) << 8;
+        let second_byte = self.ram[self.program_counter + 1] as u16;
+        OpCode::from(first_byte | second_byte)
+    }
+
     pub fn process_opcode(&mut self, opcode: OpCode) {
         match opcode {
             OpCode::ExecuteMachineSubroutine(nnn) => { /* Not implemented */ },
@@ -43,25 +69,26 @@ impl Cpu {
             },
             OpCode::ExecuteSubroutine(nnn) => {   
                 self.stack[self.stack_pointer] = self.program_counter;
+                self.stack_pointer += 1;
                 self.program_counter = nnn;
             },
             OpCode::SkipIfEqualValue(x, nn) => {   
                 let vx = self.data_registers[x as usize];
                 if vx == nn {
-                    self.program_counter += 1;
+                    self.program_counter += 2;
                 }
             },
             OpCode::SkipIfNotEqualValue(x, nn) => {   
                 let vx = self.data_registers[x as usize];
                 if vx != nn {
-                    self.program_counter += 1;
+                    self.program_counter += 2;
                 }
             },
             OpCode::SkipIfEqualRegister(x, y) => {   
                 let vx = self.data_registers[x as usize];
                 let vy = self.data_registers[y as usize];
                 if vx == vy {
-                    self.program_counter += 1;
+                    self.program_counter += 2;
                 }
             },
             OpCode::StoreValue(x, nn) => { 
