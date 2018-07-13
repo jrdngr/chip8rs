@@ -1,6 +1,9 @@
 use super::opcode::{ OpCode };
 use super::graphics::{ Screen };
 
+use std::io;
+use std::io::prelude::*;
+
 pub struct Cpu {
     program_counter: usize,
     stack_pointer: usize,
@@ -38,13 +41,11 @@ impl Cpu {
         let max = self.ram.len() - 1;
         while self.program_counter < max {
             let next_op = self.get_current_opcode();
+            println!("pc: {}  -- op: {:?}", self.program_counter, next_op);
+            self.process_opcode(next_op);
             self.program_counter += 2;
-            if let OpCode::ExecuteMachineSubroutine(n) = next_op {
-                continue;
-            } else {
-                println!("--{:?}", next_op);
-                self.process_opcode(next_op);
-            }
+
+            pause();
         }
     }
 
@@ -61,8 +62,8 @@ impl Cpu {
                 self.screen.clear();
             },
             OpCode::ReturnFromSubroutine => {   
-                self.program_counter = self.stack[self.stack_pointer];
                 self.stack_pointer -= 1;
+                self.program_counter = self.stack[self.stack_pointer];
             },
             OpCode::JumpTo(nnn) => {   
                 self.program_counter = nnn;
@@ -211,4 +212,16 @@ impl Cpu {
             },
         }
     }
+}
+
+fn pause() {
+    let mut stdin = io::stdin();
+    let mut stdout = io::stdout();
+
+    // We want the cursor to stay at the end of the line, so we print without a newline and flush manually.
+    write!(stdout, "Press any key to continue...").unwrap();
+    stdout.flush().unwrap();
+
+    // Read a single byte and discard
+    let _ = stdin.read(&mut [0u8]).unwrap();
 }
