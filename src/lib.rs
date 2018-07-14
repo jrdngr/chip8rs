@@ -1,23 +1,8 @@
-#![feature(proc_macro, wasm_custom_section, wasm_import_module)]
-
-extern crate wasm_bindgen;
 
 pub mod cpu;
 pub mod opcode;
 pub mod graphics;
 pub mod keyboard;
-
-use wasm_bindgen::prelude::*;
-
-#[wasm_bindgen]
-extern {
-    fn alert(s: &str);
-}
-
-#[wasm_bindgen]
-pub fn greet(name: &str) {
-    alert(&format!("Hay {}", name));
-}
 
 #[cfg(test)]
 mod tests {

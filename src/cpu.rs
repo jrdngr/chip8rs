@@ -4,6 +4,8 @@ use super::graphics::{ Screen };
 use std::io;
 use std::io::prelude::*;
 
+const START_ADDRESS: usize = 512;
+
 pub struct Cpu {
     program_counter: usize,
     stack_pointer: usize,
@@ -19,7 +21,7 @@ pub struct Cpu {
 impl Cpu {
     pub fn new() -> Self {
         Cpu {
-            program_counter: 200,
+            program_counter: START_ADDRESS,
             stack_pointer: 0,
             delay_timer: 0,
             sound_timer: 0,
@@ -33,7 +35,7 @@ impl Cpu {
 
     pub fn load(&mut self, rom: &Vec<u8>) {
         for (offset, byte) in rom.iter().enumerate() {
-            self.ram[200 + offset] = *byte;
+            self.ram[START_ADDRESS + offset] = *byte;
         }
     }
 
@@ -66,7 +68,7 @@ impl Cpu {
                 self.program_counter = self.stack[self.stack_pointer];
             },
             OpCode::JumpTo(nnn) => {   
-                self.program_counter = nnn;
+                self.program_counter = nnn - 2;
             },
             OpCode::ExecuteSubroutine(nnn) => {   
                 self.stack[self.stack_pointer] = self.program_counter;
@@ -159,7 +161,7 @@ impl Cpu {
             },
             OpCode::JumpWithOffset(nnn) => {   
                 let offset = self.data_registers[0] as usize;
-                self.program_counter = nnn + offset;
+                self.program_counter = nnn + offset - 2;
             },
             OpCode::SetToRandom(x, nn) => {   
 
@@ -217,10 +219,6 @@ impl Cpu {
 fn pause() {
     let mut stdin = io::stdin();
     let mut stdout = io::stdout();
-
-    // We want the cursor to stay at the end of the line, so we print without a newline and flush manually.
-    write!(stdout, "Press any key to continue...").unwrap();
-    stdout.flush().unwrap();
 
     // Read a single byte and discard
     let _ = stdin.read(&mut [0u8]).unwrap();
