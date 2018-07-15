@@ -4,8 +4,11 @@ use super::graphics::{ Screen };
 use std::io;
 use std::io::prelude::*;
 
+use wasm_bindgen::prelude::*;
+
 const START_ADDRESS: usize = 512;
 
+#[wasm_bindgen]
 pub struct Cpu {
     program_counter: usize,
     stack_pointer: usize,
@@ -19,35 +22,9 @@ pub struct Cpu {
 }
 
 impl Cpu {
-    pub fn new() -> Self {
-        Cpu {
-            program_counter: START_ADDRESS,
-            stack_pointer: 0,
-            delay_timer: 0,
-            sound_timer: 0,
-            i_register: 0,
-            data_registers: [0; 16],
-            stack: [0; 16],
-            ram: [0; 4096],
-            screen: Screen::new(),
-        }
-    }
-
     pub fn load(&mut self, rom: &Vec<u8>) {
         for (offset, byte) in rom.iter().enumerate() {
             self.ram[START_ADDRESS + offset] = *byte;
-        }
-    }
-
-    pub fn start(&mut self) {
-        let max = self.ram.len() - 1;
-        while self.program_counter < max {
-            let next_op = self.get_current_opcode();
-            println!("pc: {}  -- op: {:?}", self.program_counter, next_op);
-            self.process_opcode(next_op);
-            self.program_counter += 2;
-
-            pause();
         }
     }
 
@@ -216,10 +193,61 @@ impl Cpu {
     }
 }
 
-fn pause() {
-    let mut stdin = io::stdin();
-    let mut stdout = io::stdout();
+#[wasm_bindgen]
+impl Cpu {
+    pub fn new() -> Self {
+        Cpu {
+            program_counter: START_ADDRESS,
+            stack_pointer: 0,
+            delay_timer: 0,
+            sound_timer: 0,
+            i_register: 0,
+            data_registers: [0; 16],
+            stack: [0; 16],
+            ram: [0; 4096],
+            screen: Screen::new(),
+        }
+    }
 
-    // Read a single byte and discard
-    let _ = stdin.read(&mut [0u8]).unwrap();
+
+    pub fn start(&mut self) {
+        let max = self.ram.len() - 1;
+        while self.program_counter < max {
+            let next_op = self.get_current_opcode();
+            self.process_opcode(next_op);
+            self.program_counter += 2;
+        }
+    }
+    
+    pub fn program_counter(&self) -> usize {
+        self.program_counter
+    }
+
+    pub fn stack_pointer(&self) -> usize {
+        self.stack_pointer
+    }
+
+    pub fn delay_timer(&self) -> u8 {
+        self.delay_timer
+    }
+
+    pub fn sound_timer(&self) -> u8 {
+        self.sound_timer
+    }
+
+    pub fn i_register(&self) -> usize {
+        self.i_register as usize
+    }
+
+    pub fn data_registers(&self) -> *const u8 {
+        self.data_registers.as_ptr()
+    }
+
+    pub fn stack(&self) -> *const usize {
+        self.stack.as_ptr()
+    }
+
+    pub fn ram(&self) -> *const u8 {
+        self.ram.as_ptr()
+    }
 }

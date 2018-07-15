@@ -7,13 +7,6 @@ pub mod opcode;
 pub mod graphics;
 pub mod keyboard;
 
-use wasm_bindgen::prelude::*;
-
-#[wasm_bindgen]
-pub fn add_one(n: i32) -> i32 {
-    return n + 1;
-}
-
 #[cfg(test)]
 mod tests {
     use std::env;

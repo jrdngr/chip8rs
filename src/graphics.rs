@@ -1,10 +1,14 @@
+use wasm_bindgen::prelude::*;
+
 const WIDTH: usize = 64;
 const HEIGHT: usize = 32;
 
+#[wasm_bindgen]
 pub struct Screen {
     pixels: [bool; WIDTH * HEIGHT],
 }
 
+#[wasm_bindgen]
 impl Screen {
     pub fn new() -> Self {
         Screen {

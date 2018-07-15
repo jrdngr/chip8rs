@@ -1,7 +1,2 @@
-#!/bin/bash 
-
-if ["$1" == "release"]; then 
-    cargo +nightly build --target wasm32-unknown-unknown
-else 
-    cargo +nightly build --release --target wasm32-unknown-unknown
-fi
+#!/bin/bash
+cargo +nightly build --target wasm32-unknown-unknown && wasm-bindgen target/wasm32-unknown-unknown/debug/chip8.wasm --out-dir .

@@ -1,4 +1,4 @@
-const index = import("./chip8.js");
+const index = import("./index.js");
 index.then(() => {
   console.log("Loaded...");
 });
