@@ -1,4 +1,13 @@
 /* tslint:disable */
+export class Screen {
+free(): void;
+static  new(): Screen;
+
+ draw_sprite(arg0: number, arg1: number, arg2: number): void;
+
+ clear(): void;
+
+}
 export class Cpu {
 free(): void;
 static  new(): Cpu;
@@ -20,14 +29,5 @@ static  new(): Cpu;
  stack(): number;
 
  ram(): number;
-
-}
-export class Screen {
-free(): void;
-static  new(): Screen;
-
- draw_sprite(arg0: number, arg1: number, arg2: number): void;
-
- clear(): void;
 
 }
