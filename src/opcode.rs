@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum OpCode {
     ExecuteMachineSubroutine(usize),// 0NNN
     ClearScreen,                    // 00E0

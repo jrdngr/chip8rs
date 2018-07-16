@@ -7,6 +7,8 @@ function toArray(ptr) {
     return new Uint8Array(memory.buffer, ptr, 16);
 }
 
+const lastInstruction = document.createElement("p");
+document.body.appendChild(lastInstruction);
 
 const cpuTable = document.createElement("table");
 const cpuTableHeader = cpuTable.insertRow();
@@ -68,6 +70,8 @@ document.body.appendChild(stackTable);
 const REFRESH_RATE = 100;
 
 function updateCpuValues() {
+    lastInstruction.innerHTML = cpu.last_instruction();
+
     debugTable.pcv.innerHTML = cpu.program_counter();
     debugTable.spv.innerHTML = cpu.stack_pointer();
     debugTable.dtv.innerHTML = cpu.delay_timer();

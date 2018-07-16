@@ -14,6 +14,8 @@ static  new(): Cpu;
 
  start(): void;
 
+ last_instruction(): string;
+
  program_counter(): number;
 
  stack_pointer(): number;

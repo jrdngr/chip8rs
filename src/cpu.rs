@@ -19,6 +19,7 @@ pub struct Cpu {
     stack: [usize; 16],
     ram: [u8; 4096],
     screen: Screen,
+    last_instruction: OpCode,
 }
 
 impl Cpu {
@@ -206,6 +207,7 @@ impl Cpu {
             stack: [0; 16],
             ram: [0; 4096],
             screen: Screen::new(),
+            last_instruction: OpCode::from(0),
         }
     }
 
@@ -217,6 +219,10 @@ impl Cpu {
             self.process_opcode(next_op);
             self.program_counter += 2;
         }
+    }
+
+    pub fn last_instruction(&self) -> String {
+        format!("{:?}", self.last_instruction)
     }
     
     pub fn program_counter(&self) -> usize {

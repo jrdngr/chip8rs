@@ -1,6 +1,39 @@
 /* tslint:disable */
 import * as wasm from './chip8_bg';
 
+const TextDecoder = typeof self === 'object' && self.TextDecoder
+    ? self.TextDecoder
+    : require('util').TextDecoder;
+
+let cachedDecoder = new TextDecoder('utf-8');
+
+let cachegetUint8Memory = null;
+function getUint8Memory() {
+    if (cachegetUint8Memory === null ||
+        cachegetUint8Memory.buffer !== wasm.memory.buffer)
+        cachegetUint8Memory = new Uint8Array(wasm.memory.buffer);
+    return cachegetUint8Memory;
+}
+
+function getStringFromWasm(ptr, len) {
+    return cachedDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
+}
+
+let cachedGlobalArgumentPtr = null;
+function globalArgumentPtr() {
+    if (cachedGlobalArgumentPtr === null)
+        cachedGlobalArgumentPtr = wasm.__wbindgen_global_argument_ptr();
+    return cachedGlobalArgumentPtr;
+}
+
+let cachegetUint32Memory = null;
+function getUint32Memory() {
+    if (cachegetUint32Memory === null ||
+        cachegetUint32Memory.buffer !== wasm.memory.buffer)
+        cachegetUint32Memory = new Uint32Array(wasm.memory.buffer);
+    return cachegetUint32Memory;
+}
+
 export class Screen {
 
                 static __construct(ptr) {
@@ -47,6 +80,16 @@ export class Cpu {
 }
 start() {
     return wasm.cpu_start(this.ptr);
+}
+last_instruction() {
+    const retptr = globalArgumentPtr();
+    wasm.cpu_last_instruction(retptr, this.ptr);
+    const mem = getUint32Memory();
+    const ptr = mem[retptr / 4];
+    const len = mem[retptr / 4 + 1];
+    const realRet = getStringFromWasm(ptr, len).slice();
+    wasm.__wbindgen_free(ptr, len * 1);
+    return realRet;
 }
 program_counter() {
     return wasm.cpu_program_counter(this.ptr);
@@ -130,24 +173,6 @@ function dropRef(idx) {
 
 export function __wbindgen_object_drop_ref(i) { dropRef(i); }
 
-const TextDecoder = typeof self === 'object' && self.TextDecoder
-    ? self.TextDecoder
-    : require('util').TextDecoder;
-
-let cachedDecoder = new TextDecoder('utf-8');
-
-let cachegetUint8Memory = null;
-function getUint8Memory() {
-    if (cachegetUint8Memory === null ||
-        cachegetUint8Memory.buffer !== wasm.memory.buffer)
-        cachegetUint8Memory = new Uint8Array(wasm.memory.buffer);
-    return cachegetUint8Memory;
-}
-
-function getStringFromWasm(ptr, len) {
-    return cachedDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
-}
-
 export function __wbindgen_string_new(p, l) {
     return addHeapObject(getStringFromWasm(p, l));
 }
@@ -215,14 +240,6 @@ function passStringToWasm(arg) {
     const ptr = wasm.__wbindgen_malloc(buf.length);
     getUint8Memory().set(buf, ptr);
     return [ptr, buf.length];
-}
-
-let cachegetUint32Memory = null;
-function getUint32Memory() {
-    if (cachegetUint32Memory === null ||
-        cachegetUint32Memory.buffer !== wasm.memory.buffer)
-        cachegetUint32Memory = new Uint32Array(wasm.memory.buffer);
-    return cachegetUint32Memory;
 }
 
 export function __wbindgen_string_get(i, len_ptr) {
