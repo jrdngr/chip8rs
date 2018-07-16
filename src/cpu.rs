@@ -215,10 +215,14 @@ impl Cpu {
     pub fn start(&mut self) {
         let max = self.ram.len() - 1;
         while self.program_counter < max {
-            let next_op = self.get_current_opcode();
-            self.process_opcode(next_op);
-            self.program_counter += 2;
+            self.step();
         }
+    }
+
+    pub fn step(&mut self) {
+        let next_op = self.get_current_opcode();
+        self.process_opcode(next_op);
+        self.program_counter += 2;
     }
 
     pub fn last_instruction(&self) -> String {

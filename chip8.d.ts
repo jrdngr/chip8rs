@@ -14,6 +14,8 @@ static  new(): Cpu;
 
  start(): void;
 
+ step(): void;
+
  last_instruction(): string;
 
  program_counter(): number;

@@ -81,6 +81,9 @@ export class Cpu {
 start() {
     return wasm.cpu_start(this.ptr);
 }
+step() {
+    return wasm.cpu_step(this.ptr);
+}
 last_instruction() {
     const retptr = globalArgumentPtr();
     wasm.cpu_last_instruction(retptr, this.ptr);

@@ -67,6 +67,13 @@ stackTable.border = "1px solid black";
 document.body.appendChild(stackTable);
 
 
+
+const stepButton = document.createElement("button");
+stepButton.innerText = "Step";
+stepButton.addEventListener("click", () => cpu.step());
+document.body.appendChild(stepButton);
+
+
 const REFRESH_RATE = 100;
 
 function updateCpuValues() {
