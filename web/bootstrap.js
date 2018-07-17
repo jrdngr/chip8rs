@@ -1,4 +1,4 @@
-const index = import("./index.js");
+const index = import("./index.ts");
 index.then(() => {
   console.log("Loaded...");
 });
