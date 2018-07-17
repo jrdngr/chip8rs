@@ -8,11 +8,11 @@ impl Keyboard {
     }
 
     pub fn key_down(&mut self, key: u8) {
-        self.state = self.state | key_to_mask(key);
+        self.state = self.state | Keyboard::key_to_mask(key);
     }
 
     pub fn key_up(&mut self, key: u8) {
-        self.state = self.state ^ (!key);
+        self.state = self.state & (!Keyboard::key_to_mask(key));
     }
 
     pub fn is_key_down(&self, key: u8) -> bool {
@@ -30,7 +30,25 @@ mod tests {
 
     #[test]
     fn test_key_to_mask() {
-        let keyb = Keyboard::new();
-        println!("k: {}", Keyboard::key_to_mask(0xF));
+        assert_eq!(Keyboard::key_to_mask(0x0), 1);
+        assert_eq!(Keyboard::key_to_mask(0x1), 2);
+        assert_eq!(Keyboard::key_to_mask(0x2), 4);
+        assert_eq!(Keyboard::key_to_mask(0xF), 32768);
     }
-}
+
+    #[test]
+    fn test_key_presses() {
+        let mut keyboard = Keyboard::new();
+        keyboard.key_down(1);
+        assert_eq!(2, keyboard.state);
+        keyboard.key_down(2);
+        assert_eq!(6, keyboard.state);
+        keyboard.key_down(3);
+        assert_eq!(14, keyboard.state);
+        keyboard.key_up(1);
+        assert_eq!(12, keyboard.state);
+        keyboard.key_up(2);
+        assert_eq!(8, keyboard.state);
+        keyboard.key_up(3);
+        assert_eq!(0, keyboard.state);
+    }}
