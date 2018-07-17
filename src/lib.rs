@@ -23,6 +23,6 @@ mod tests {
 
         let mut cpu = cpu::Cpu::new();
         cpu.load(&buffer);
-        cpu.start();
+        //cpu.start();
     }
 }
