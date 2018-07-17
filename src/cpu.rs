@@ -9,6 +9,13 @@ use wasm_bindgen::prelude::*;
 const START_ADDRESS: usize = 512;
 
 #[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+}
+
+
+#[wasm_bindgen]
 pub struct Cpu {
     program_counter: usize,
     stack_pointer: usize,
@@ -211,6 +218,12 @@ impl Cpu {
         }
     }
 
+    pub fn load_from_web(&mut self, rom: Vec<u8>) {
+        for (offset, byte) in rom.iter().enumerate() {
+            self.ram[START_ADDRESS + offset] = *byte;
+        }
+        log(&format!("{}", rom.len()));
+    }
 
     pub fn start(&mut self) {
         let max = self.ram.len() - 1;
@@ -221,6 +234,7 @@ impl Cpu {
 
     pub fn step(&mut self) {
         let next_op = self.get_current_opcode();
+        self.last_instruction = next_op.clone();
         self.process_opcode(next_op);
         self.program_counter += 2;
     }

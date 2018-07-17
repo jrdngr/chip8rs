@@ -7,6 +7,20 @@ function toArray(ptr) {
     return new Uint8Array(memory.buffer, ptr, 16);
 }
 
+
+const fileButton = document.getElementById("fileButton");
+fileButton.onchange = function(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function(args) {
+        var arrayBuffer = args.target.result;
+        var fileBytes = new Uint8Array(arrayBuffer);
+        cpu.load_from_web(fileBytes);
+        console.log("Loaded " + file.name);
+    };
+    reader.readAsArrayBuffer(file);
+}
+
 const lastInstruction = document.createElement("p");
 document.body.appendChild(lastInstruction);
 

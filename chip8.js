@@ -1,6 +1,8 @@
 /* tslint:disable */
 import * as wasm from './chip8_bg';
 
+const __wbg_f_log_log_n_target = console.log;
+
 const TextDecoder = typeof self === 'object' && self.TextDecoder
     ? self.TextDecoder
     : require('util').TextDecoder;
@@ -17,6 +19,25 @@ function getUint8Memory() {
 
 function getStringFromWasm(ptr, len) {
     return cachedDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
+}
+
+export function __wbg_f_log_log_n(arg0, arg1) {
+    let varg0 = getStringFromWasm(arg0, arg1);
+    __wbg_f_log_log_n_target(varg0);
+}
+
+let cachegetUint64Memory = null;
+function getUint64Memory() {
+    if (cachegetUint64Memory === null ||
+        cachegetUint64Memory.buffer !== wasm.memory.buffer)
+        cachegetUint64Memory = new BigUint64Array(wasm.memory.buffer);
+    return cachegetUint64Memory;
+}
+
+function passArray8ToWasm(arg) {
+    const ptr = wasm.__wbindgen_malloc(arg.length * 1);
+    getUint8Memory().set(arg, ptr / 1);
+    return [ptr, arg.length];
 }
 
 let cachedGlobalArgumentPtr = null;
@@ -77,6 +98,10 @@ export class Cpu {
             }
         static new() {
     return Cpu.__construct(wasm.cpu_new());
+}
+load_from_web(arg0) {
+    const [ptr0, len0] = passArray8ToWasm(arg0);
+    return wasm.cpu_load_from_web(this.ptr, ptr0, len0);
 }
 start() {
     return wasm.cpu_start(this.ptr);

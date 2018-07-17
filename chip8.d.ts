@@ -12,6 +12,8 @@ export class Cpu {
 free(): void;
 static  new(): Cpu;
 
+ load_from_web(arg0: Uint8Array): void;
+
  start(): void;
 
  step(): void;
