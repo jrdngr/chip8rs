@@ -1,4 +1,5 @@
 use super::opcode::{ OpCode };
+use super::keyboard::{ Keyboard };
 use super::rng::{ generate_random };
 
 use std::io;
@@ -30,6 +31,7 @@ pub struct Cpu {
     data_registers: [u8; 16],
     stack: [usize; 16],
     ram: [u8; 4096],
+    keyboard: Keyboard,
 }
 
 impl Cpu {
@@ -158,17 +160,27 @@ impl Cpu {
             OpCode::DrawSprite(x, y, n) => {   
                 setPixel(x, y);
             },
-            OpCode::SkipIfKeyPressed(x) => {   
-
+            OpCode::SkipIfKeyPressed(x) => { 
+                let key = self.data_registers[x as usize]; 
+                if self.keyboard.is_key_down(key) {
+                    self.program_counter += 2;
+                }
             },
-            OpCode::SkipIfKeyNotPressed(x) => {   
-
+            OpCode::SkipIfKeyNotPressed(x) => { 
+                let key = self.data_registers[x as usize];  
+                if !self.keyboard.is_key_down(key) {
+                    self.program_counter += 2;
+                }
             },
             OpCode::StoreDelayTimer(x) => { 
                 self.data_registers[x as usize] = self.delay_timer; 
             },
-            OpCode::WaitAndStoreKey(x) => {   
-
+            OpCode::WaitAndStoreKey(x) => { 
+                if self.keyboard.any_keys_down() {
+                    self.data_registers[x as usize] = self.keyboard.last_key_down();
+                } else {
+                    self.program_counter() -= 2;
+                }
             },
             OpCode::SetDelayTimer(x) => { 
                 self.delay_timer = self.data_registers[x as usize]; 
@@ -216,6 +228,7 @@ impl Cpu {
             data_registers: [0; 16],
             stack: [0; 16],
             ram: [0; 4096],
+            keyboard: Keyboard::new(),
         }
     }
 

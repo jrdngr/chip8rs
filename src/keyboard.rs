@@ -1,5 +1,6 @@
-struct Keyboard {
+pub struct Keyboard {
     state: u16,
+    last_key_down: u8,
 }
 
 impl Keyboard {
@@ -9,6 +10,7 @@ impl Keyboard {
 
     pub fn key_down(&mut self, key: u8) {
         self.state = self.state | Keyboard::key_to_mask(key);
+        self.last_key_down = key;
     }
 
     pub fn key_up(&mut self, key: u8) {
@@ -17,6 +19,14 @@ impl Keyboard {
 
     pub fn is_key_down(&self, key: u8) -> bool {
         true
+    }
+
+    pub fn last_key_down(&self) -> u8 {
+        self.last
+    }
+
+    pub fn any_keys_down(&self) -> bool {
+        self.state != 0
     }
 
     fn key_to_mask(key: u8) -> u16 {
