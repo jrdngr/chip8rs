@@ -9,7 +9,6 @@ function toArray(ptr: number) {
     return new Uint8Array(memory.buffer, ptr, 16);
 }
 
-
 const fileButton = document.getElementById("fileButton");
 fileButton.onchange = function(event: any) {
     const file = event.target.files[0];
@@ -61,8 +60,6 @@ registerTable.cellPadding = "5";
 registerTable.border = "1px solid black";
 document.body.appendChild(registerTable);
 
-
-
 const stackTable = document.createElement("table");
 const stackNumbersRow = stackTable.insertRow();
 const stackValuesRow = stackTable.insertRow();
@@ -78,8 +75,6 @@ for (let i = 0; i < 16; i++) {
 stackTable.cellPadding = "5";
 stackTable.border = "1px solid black";
 document.body.appendChild(stackTable);
-
-
 
 const stepButton = document.createElement("button");
 stepButton.innerText = "Step";
