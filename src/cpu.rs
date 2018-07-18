@@ -1,5 +1,5 @@
 use super::opcode::{ OpCode };
-use super::rng::{ generate_random };
+use super::rng::{ Rng };
 
 use std::io;
 use std::io::prelude::*;
@@ -30,6 +30,7 @@ pub struct Cpu {
     data_registers: [u8; 16],
     stack: [usize; 16],
     ram: [u8; 4096],
+    rng: Rng,
 }
 
 impl Cpu {
@@ -152,7 +153,7 @@ impl Cpu {
                 self.program_counter = nnn + offset - 2;
             },
             OpCode::SetToRandom(x, nn) => {   
-                let random = generate_random(getRandomSeed()) & nn;
+                let random = self.rng.random_u8() & nn;
                 self.data_registers[x as usize] = random;
             },
             OpCode::DrawSprite(x, y, n) => {   
@@ -216,6 +217,7 @@ impl Cpu {
             data_registers: [0; 16],
             stack: [0; 16],
             ram: [0; 4096],
+            rng: Rng::new(getRandomSeed()),
         }
     }
 

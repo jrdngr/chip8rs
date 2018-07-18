@@ -1,4 +1,4 @@
-#![feature(proc_macro, wasm_custom_section, wasm_import_module)]
+#![feature(use_extern_macros, proc_macro, wasm_custom_section, wasm_import_module)]
 
 extern crate wasm_bindgen;
 
@@ -15,13 +15,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn breakout() {
-        let mut f = File::open("breakout.ch8").expect("File not found");
-        let mut buffer = Vec::new();
-        f.read_to_end(&mut buffer).expect("Error reading file");
-
-        let mut cpu = cpu::Cpu::new();
-        cpu.load(&buffer);
-        //cpu.start();
+    fn template() {
+        assert_eq!(1, 1);
     }
 }
