@@ -18,8 +18,6 @@ fileButton.onchange = function (event) {
     };
     reader.readAsArrayBuffer(file);
 };
-var lastInstruction = document.createElement("p");
-document.body.appendChild(lastInstruction);
 var cpuTable = document.createElement("table");
 var cpuTableHeader = cpuTable.insertRow();
 var cpuTableValues = cpuTable.insertRow();
@@ -71,7 +69,6 @@ stepButton.addEventListener("click", function () { return cpu.step(); });
 document.body.appendChild(stepButton);
 var REFRESH_RATE = 100;
 function updateCpuValues() {
-    lastInstruction.innerHTML = cpu.last_instruction();
     debugTable.pcv.innerHTML = cpu.program_counter().toString();
     debugTable.spv.innerHTML = cpu.stack_pointer().toString();
     debugTable.dtv.innerHTML = cpu.delay_timer().toString();
@@ -88,3 +85,9 @@ updateCpuValues();
 var canvas = document.getElementById("canvas");
 // @ts-ignore
 console.log(cpu.screen);
+export function togglePixel(x, y) {
+    console.log(x + " " + y);
+}
+export function clearScreen() {
+    console.log("clear");
+}

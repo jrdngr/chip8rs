@@ -1,5 +1,7 @@
 /* tslint:disable */
 import * as wasm from './chip8_bg';
+import { togglePixel } from './js/index';
+import { clearScreen } from './js/index';
 
 const __wbg_f_log_log_n_target = console.log;
 
@@ -26,6 +28,14 @@ export function __wbg_f_log_log_n(arg0, arg1) {
     __wbg_f_log_log_n_target(varg0);
 }
 
+export function __wbg_f_togglePixel_togglePixel_n(arg0, arg1) {
+    togglePixel(arg0, arg1);
+}
+
+export function __wbg_f_clearScreen_clearScreen_n() {
+    clearScreen();
+}
+
 let cachegetUint64Memory = null;
 function getUint64Memory() {
     if (cachegetUint64Memory === null ||
@@ -38,47 +48,6 @@ function passArray8ToWasm(arg) {
     const ptr = wasm.__wbindgen_malloc(arg.length * 1);
     getUint8Memory().set(arg, ptr / 1);
     return [ptr, arg.length];
-}
-
-let cachedGlobalArgumentPtr = null;
-function globalArgumentPtr() {
-    if (cachedGlobalArgumentPtr === null)
-        cachedGlobalArgumentPtr = wasm.__wbindgen_global_argument_ptr();
-    return cachedGlobalArgumentPtr;
-}
-
-let cachegetUint32Memory = null;
-function getUint32Memory() {
-    if (cachegetUint32Memory === null ||
-        cachegetUint32Memory.buffer !== wasm.memory.buffer)
-        cachegetUint32Memory = new Uint32Array(wasm.memory.buffer);
-    return cachegetUint32Memory;
-}
-
-export class Screen {
-
-                static __construct(ptr) {
-                    return new Screen(ptr);
-                }
-
-                constructor(ptr) {
-                    this.ptr = ptr;
-                }
-
-            free() {
-                const ptr = this.ptr;
-                this.ptr = 0;
-                wasm.__wbg_screen_free(ptr);
-            }
-        static new() {
-    return Screen.__construct(wasm.screen_new());
-}
-draw_sprite(arg0, arg1, arg2) {
-    return wasm.screen_draw_sprite(this.ptr, arg0, arg1, arg2);
-}
-clear() {
-    return wasm.screen_clear(this.ptr);
-}
 }
 
 export class Cpu {
@@ -108,16 +77,6 @@ start() {
 }
 step() {
     return wasm.cpu_step(this.ptr);
-}
-last_instruction() {
-    const retptr = globalArgumentPtr();
-    wasm.cpu_last_instruction(retptr, this.ptr);
-    const mem = getUint32Memory();
-    const ptr = mem[retptr / 4];
-    const len = mem[retptr / 4 + 1];
-    const realRet = getStringFromWasm(ptr, len).slice();
-    wasm.__wbindgen_free(ptr, len * 1);
-    return realRet;
 }
 program_counter() {
     return wasm.cpu_program_counter(this.ptr);
@@ -268,6 +227,14 @@ function passStringToWasm(arg) {
     const ptr = wasm.__wbindgen_malloc(buf.length);
     getUint8Memory().set(buf, ptr);
     return [ptr, buf.length];
+}
+
+let cachegetUint32Memory = null;
+function getUint32Memory() {
+    if (cachegetUint32Memory === null ||
+        cachegetUint32Memory.buffer !== wasm.memory.buffer)
+        cachegetUint32Memory = new Uint32Array(wasm.memory.buffer);
+    return cachegetUint32Memory;
 }
 
 export function __wbindgen_string_get(i, len_ptr) {

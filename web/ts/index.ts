@@ -23,9 +23,6 @@ fileButton.onchange = function(event: any) {
     reader.readAsArrayBuffer(file);
 }
 
-const lastInstruction = document.createElement("p");
-document.body.appendChild(lastInstruction);
-
 const cpuTable = document.createElement("table");
 const cpuTableHeader = cpuTable.insertRow();
 const cpuTableValues = cpuTable.insertRow();
@@ -93,8 +90,6 @@ document.body.appendChild(stepButton);
 const REFRESH_RATE = 100;
 
 function updateCpuValues() {
-    lastInstruction.innerHTML = cpu.last_instruction();
-
     debugTable.pcv.innerHTML = cpu.program_counter().toString();
     debugTable.spv.innerHTML = cpu.stack_pointer().toString();
     debugTable.dtv.innerHTML = cpu.delay_timer().toString();
@@ -113,9 +108,14 @@ function updateCpuValues() {
 
 updateCpuValues();
 
-
-
-
 const canvas = <HTMLCanvasElement>document.getElementById("canvas");
 // @ts-ignore
 console.log(cpu.screen)
+
+export function togglePixel(x: number, y: number) {
+    console.log(x + " " + y);
+}
+
+export function clearScreen() {
+    console.log("clear");
+}

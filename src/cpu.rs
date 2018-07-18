@@ -1,5 +1,4 @@
 use super::opcode::{ OpCode };
-use super::graphics::{ Screen };
 
 use std::io;
 use std::io::prelude::*;
@@ -12,8 +11,11 @@ const START_ADDRESS: usize = 512;
 extern "C" {
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
+    #[wasm_bindgen(module = "./js/index")]
+    fn togglePixel(x: u8, y: u8);
+    #[wasm_bindgen(module = "./js/index")]
+    fn clearScreen();
 }
-
 
 #[wasm_bindgen]
 pub struct Cpu {
@@ -25,8 +27,6 @@ pub struct Cpu {
     data_registers: [u8; 16],
     stack: [usize; 16],
     ram: [u8; 4096],
-    screen: Screen,
-    last_instruction: OpCode,
 }
 
 impl Cpu {
@@ -46,7 +46,7 @@ impl Cpu {
         match opcode {
             OpCode::ExecuteMachineSubroutine(nnn) => { /* Not implemented */ },
             OpCode::ClearScreen => {   
-                self.screen.clear();
+                clearScreen();
             },
             OpCode::ReturnFromSubroutine => {   
                 self.stack_pointer -= 1;
@@ -152,7 +152,7 @@ impl Cpu {
 
             },
             OpCode::DrawSprite(x, y, n) => {   
-                self.screen.draw_sprite(x, y, n);
+                togglePixel(x, y);
             },
             OpCode::SkipIfKeyPressed(x) => {   
 
@@ -213,8 +213,6 @@ impl Cpu {
             data_registers: [0; 16],
             stack: [0; 16],
             ram: [0; 4096],
-            screen: Screen::new(),
-            last_instruction: OpCode::from(0),
         }
     }
 
@@ -222,7 +220,6 @@ impl Cpu {
         for (offset, byte) in rom.iter().enumerate() {
             self.ram[START_ADDRESS + offset] = *byte;
         }
-        log(&format!("{}", rom.len()));
     }
 
     pub fn start(&mut self) {
@@ -234,15 +231,11 @@ impl Cpu {
 
     pub fn step(&mut self) {
         let next_op = self.get_current_opcode();
-        self.last_instruction = next_op.clone();
+        log(&format!("{:?}", next_op));
         self.process_opcode(next_op);
         self.program_counter += 2;
     }
 
-    pub fn last_instruction(&self) -> String {
-        format!("{:?}", self.last_instruction)
-    }
-    
     pub fn program_counter(&self) -> usize {
         self.program_counter
     }
