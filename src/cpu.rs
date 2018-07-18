@@ -13,7 +13,7 @@ extern "C" {
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
     #[wasm_bindgen(module = "./js/index")]
-    fn getRandomSeed() -> i64;
+    fn getRandomSeed() -> i32;
     #[wasm_bindgen(module = "./js/index")]
     fn setPixel(x: u8, y: u8);
     #[wasm_bindgen(module = "./js/index")]
@@ -38,12 +38,7 @@ impl Cpu {
         for (offset, byte) in rom.iter().enumerate() {
             self.ram[START_ADDRESS + offset] = *byte;
         }
-    }
-
-    fn get_current_opcode(&self) -> OpCode {
-        let first_byte = (self.ram[self.program_counter] as u16) << 8;
-        let second_byte = self.ram[self.program_counter + 1] as u16;
-        OpCode::from(first_byte | second_byte)
+        self.reset_program_counter();
     }
 
     pub fn process_opcode(&mut self, opcode: OpCode) {
@@ -203,6 +198,17 @@ impl Cpu {
             },
         }
     }
+    
+    fn get_current_opcode(&self) -> OpCode {
+        let first_byte = (self.ram[self.program_counter] as u16) << 8;
+        let second_byte = self.ram[self.program_counter + 1] as u16;
+        OpCode::from(first_byte | second_byte)
+    }
+
+    fn reset_program_counter(&mut self) {
+        self.program_counter = START_ADDRESS;
+    }
+
 }
 
 #[wasm_bindgen]

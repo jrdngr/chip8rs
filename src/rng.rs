@@ -1,9 +1,9 @@
 pub struct Rng {
-    seed: i64,
+    seed: i32,
 }
 
 impl Rng {
-    pub fn new(seed: i64) -> Self{
+    pub fn new(seed: i32) -> Self{
         Rng { seed }
     }
 
@@ -21,14 +21,14 @@ mod tests {
     fn test_random() {
         let mut rng = Rng::new(1);
         assert_eq!(rng.random_u8(), 45);
-        assert_eq!(rng.random_u8(), 210);
-        assert_eq!(rng.random_u8(), 234);
-        assert_eq!(rng.random_u8(), 97);
+        assert_eq!(rng.random_u8(), 173);
+        assert_eq!(rng.random_u8(), 34);
+        assert_eq!(rng.random_u8(), 9);
 
         let mut rng = Rng::new(2);
         assert_eq!(rng.random_u8(), 240);
-        assert_eq!(rng.random_u8(), 240);
-        assert_eq!(rng.random_u8(), 247);
-        assert_eq!(rng.random_u8(), 76);
+        assert_eq!(rng.random_u8(), 22);
+        assert_eq!(rng.random_u8(), 146);
+        assert_eq!(rng.random_u8(), 141);
     }
 }

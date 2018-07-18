@@ -83,8 +83,18 @@ document.body.appendChild(stackTable);
 
 const stepButton = document.createElement("button");
 stepButton.innerText = "Step";
-stepButton.addEventListener("click", () => cpu.step());
+stepButton.addEventListener("click", stepCpu);
 document.body.appendChild(stepButton);
+
+document.addEventListener("keydown", function(event) {
+    if (event.keyCode == 32) {
+        stepCpu();
+    }
+});
+
+function stepCpu() {
+    cpu.step();
+}
 
 
 const REFRESH_RATE = 100;
@@ -111,11 +121,11 @@ updateCpuValues();
 const canvas = <HTMLCanvasElement>document.getElementById("canvas");
 
 export function setPixel(x: number, y: number) {
-    console.log(x + " " + y);
+    
 }
 
 export function clearScreen() {
-    console.log("clear");
+    
 }
 
 export function getRandomSeed() {
