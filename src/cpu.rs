@@ -274,4 +274,5 @@ impl Cpu {
     pub fn ram(&self) -> *const u8 {
         self.ram.as_ptr()
     }
+
 }

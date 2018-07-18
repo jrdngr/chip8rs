@@ -1,5 +1,5 @@
 /* tslint:disable */
-import * as wasm from './chip8_bg.wasm';
+import * as wasm from './chip8_bg';
 
 const __wbg_f_log_log_n_target = console.log;
 
