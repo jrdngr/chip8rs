@@ -83,11 +83,11 @@ function updateCpuValues() {
 }
 updateCpuValues();
 var canvas = document.getElementById("canvas");
-// @ts-ignore
-console.log(cpu.screen);
-export function togglePixel(x, y) {
+export function setPixel(x, y) {
     console.log(x + " " + y);
 }
 export function clearScreen() {
     console.log("clear");
+}
+export function getRandomSeed() {
 }

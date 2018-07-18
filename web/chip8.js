@@ -1,6 +1,7 @@
 /* tslint:disable */
 import * as wasm from './chip8_bg';
-import { togglePixel } from './js/index';
+import { getRandomSeed } from './js/index';
+import { setPixel } from './js/index';
 import { clearScreen } from './js/index';
 
 const __wbg_f_log_log_n_target = console.log;
@@ -28,8 +29,12 @@ export function __wbg_f_log_log_n(arg0, arg1) {
     __wbg_f_log_log_n_target(varg0);
 }
 
-export function __wbg_f_togglePixel_togglePixel_n(arg0, arg1) {
-    togglePixel(arg0, arg1);
+export function __wbg_f_getRandomSeed_getRandomSeed_n() {
+    getRandomSeed();
+}
+
+export function __wbg_f_setPixel_setPixel_n(arg0, arg1) {
+    setPixel(arg0, arg1);
 }
 
 export function __wbg_f_clearScreen_clearScreen_n() {

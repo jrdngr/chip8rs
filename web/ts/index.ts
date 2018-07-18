@@ -109,13 +109,15 @@ function updateCpuValues() {
 updateCpuValues();
 
 const canvas = <HTMLCanvasElement>document.getElementById("canvas");
-// @ts-ignore
-console.log(cpu.screen)
 
-export function togglePixel(x: number, y: number) {
+export function setPixel(x: number, y: number) {
     console.log(x + " " + y);
 }
 
 export function clearScreen() {
     console.log("clear");
+}
+
+export function getRandomSeed() {
+    
 }

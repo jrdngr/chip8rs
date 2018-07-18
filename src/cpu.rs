@@ -1,4 +1,5 @@
 use super::opcode::{ OpCode };
+use super::rng::{ generate_random };
 
 use std::io;
 use std::io::prelude::*;
@@ -12,7 +13,9 @@ extern "C" {
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
     #[wasm_bindgen(module = "./js/index")]
-    fn togglePixel(x: u8, y: u8);
+    fn getRandomSeed();
+    #[wasm_bindgen(module = "./js/index")]
+    fn setPixel(x: u8, y: u8);
     #[wasm_bindgen(module = "./js/index")]
     fn clearScreen();
 }
@@ -149,10 +152,10 @@ impl Cpu {
                 self.program_counter = nnn + offset - 2;
             },
             OpCode::SetToRandom(x, nn) => {   
-
+                self.data_registers[x as usize];
             },
             OpCode::DrawSprite(x, y, n) => {   
-                togglePixel(x, y);
+                setPixel(x, y);
             },
             OpCode::SkipIfKeyPressed(x) => {   
 
@@ -183,7 +186,6 @@ impl Cpu {
                 self.ram[self.i_register] = vx / 100;
                 self.ram[self.i_register + 1] = (vx / 10) % 10;
                 self.ram[self.i_register + 2] = vx % 10;
-
             },
             OpCode::StoreRegisters(x) => {   
                for address in 0..x {
