@@ -13,7 +13,7 @@ extern "C" {
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
     #[wasm_bindgen(module = "./js/index")]
-    fn getRandomSeed();
+    fn getRandomSeed() -> i64;
     #[wasm_bindgen(module = "./js/index")]
     fn setPixel(x: u8, y: u8);
     #[wasm_bindgen(module = "./js/index")]
@@ -152,7 +152,8 @@ impl Cpu {
                 self.program_counter = nnn + offset - 2;
             },
             OpCode::SetToRandom(x, nn) => {   
-                self.data_registers[x as usize];
+                let random = generate_random(getRandomSeed()) & nn;
+                self.data_registers[x as usize] = random;
             },
             OpCode::DrawSprite(x, y, n) => {   
                 setPixel(x, y);
