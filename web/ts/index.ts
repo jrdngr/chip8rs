@@ -9,6 +9,18 @@ function toArray(ptr: number) {
     return new Uint8Array(memory.buffer, ptr, 16);
 }
 
+document.addEventListener("keydown", function(event) {
+    if (event.key == " ") {
+        stepCpu();
+    } else {
+        cpu.set_key_down(parseInt(event.key, 16));
+    }
+});
+
+document.addEventListener("keyup", function(event) {
+    cpu.set_key_up(parseInt(event.key, 16));
+});
+
 const fileButton = document.getElementById("fileButton");
 fileButton.onchange = function(event: any) {
     const file = event.target.files[0];
@@ -32,17 +44,18 @@ const debugTable = {
     sp: cpuTableHeader.insertCell().innerHTML = "SP",
     dt: cpuTableHeader.insertCell().innerHTML = "DT",
     st: cpuTableHeader.insertCell().innerHTML = "ST",
+    kb: cpuTableHeader.insertCell().innerHTML = "KB",
     values: cpuTableValues,
     pcv: cpuTableValues.insertCell(),
     spv: cpuTableValues.insertCell(),
     dtv: cpuTableValues.insertCell(),
     stv: cpuTableValues.insertCell(),
+    kbv: cpuTableValues.insertCell(),
 };
 
 cpuTable.cellPadding = "5";
 cpuTable.border = "1px solid black";
 document.body.appendChild(debugTable.table);
-
 
 const registerTable = document.createElement("table");
 const registerNumbersRow = registerTable.insertRow();
@@ -81,11 +94,7 @@ stepButton.innerText = "Step";
 stepButton.addEventListener("click", stepCpu);
 document.body.appendChild(stepButton);
 
-document.addEventListener("keydown", function(event) {
-    if (event.keyCode == 32) {
-        stepCpu();
-    }
-});
+
 
 function stepCpu() {
     cpu.step();
@@ -99,6 +108,7 @@ function updateCpuValues() {
     debugTable.spv.innerHTML = cpu.stack_pointer().toString();
     debugTable.dtv.innerHTML = cpu.delay_timer().toString();
     debugTable.stv.innerHTML = cpu.sound_timer().toString();
+    debugTable.kbv.innerHTML = cpu.get_keyboard_state().toString();
 
     const registers = toArray(cpu.data_registers());
     const stack = toArray(cpu.stack());

@@ -1,53 +1,49 @@
 use wasm_bindgen::prelude::*;
-
-pub trait Keyboard {
-    fn set_key_down(&mut self, key: u8);
-    fn set_key_up(&mut self, key: u8);
-    fn get_key_down(&self, key: u8) -> bool;
-    fn any_keys_down(&self) -> bool;
-    fn last_key_down(&self) -> u8;
-    fn key_to_mask(key: u8) -> u16 {
-        1u16 << (key as u16 & 0x0Fu16)
-    }
-}
+use ::hardware::cpu::{ log };
 
 #[wasm_bindgen]
-#[derive(Clone)]
-pub struct JavaScriptKeyboard {
+pub struct Keyboard {
     state: u16,
     last_key_down: u8,
 }
 
 #[wasm_bindgen]
-impl JavaScriptKeyboard {
+impl Keyboard {
     pub fn new() -> Self {
-        JavaScriptKeyboard { 
+        Keyboard { 
             state: 0,
             last_key_down: 0,
         }
     }
-}
 
-impl Keyboard for JavaScriptKeyboard {
-    fn set_key_down(&mut self, key: u8) {
-        self.state = self.state | JavaScriptKeyboard::key_to_mask(key);
+    pub fn set_key_down(&mut self, key: u8) {
+        let new_state = self.state | Keyboard::key_to_mask(key);
+        self.state = new_state;
         self.last_key_down = key;
     }
 
-    fn set_key_up(&mut self, key: u8) {
-        self.state = self.state & (!JavaScriptKeyboard::key_to_mask(key));
+    pub fn set_key_up(&mut self, key: u8) {
+        self.state = self.state & (!Keyboard::key_to_mask(key));
     }
 
-    fn get_key_down(&self, key: u8) -> bool {
+    pub fn get_key_down(&self, key: u8) -> bool {
         true
     }
 
-    fn any_keys_down(&self) -> bool {
+    pub fn any_keys_down(&self) -> bool {
         self.state != 0
     }
 
-    fn last_key_down(&self) -> u8 {
+    pub fn last_key_down(&self) -> u8 {
         self.last_key_down
+    }
+
+    pub fn get_state(&self) -> u16 {
+        self.state
+    }
+
+    fn key_to_mask(key: u8) -> u16 {
+        1u16 << (key as u16 & 0x0Fu16)
     }
 }
 

@@ -1,5 +1,5 @@
 use ::opcode::{ OpCode };
-use ::hardware::keyboard::{ Keyboard, JavaScriptKeyboard };
+use ::hardware::keyboard::{ Keyboard };
 use ::rng::{ Rng };
 
 use std::io;
@@ -12,7 +12,7 @@ const START_ADDRESS: usize = 512;
 #[wasm_bindgen]
 extern "C" {
     #[wasm_bindgen(js_namespace = console)]
-    fn log(s: &str);
+    pub fn log(s: &str);
     #[wasm_bindgen(module = "./js/index")]
     fn getRandomSeed() -> i32;
     #[wasm_bindgen(module = "./js/index")]
@@ -31,7 +31,7 @@ pub struct Cpu {
     data_registers: [u8; 16],
     stack: [usize; 16],
     ram: [u8; 4096],
-    keyboard: JavaScriptKeyboard,
+    keyboard: Keyboard,
     rng: Rng,
 }
 
@@ -235,7 +235,7 @@ impl Cpu {
             data_registers: [0; 16],
             stack: [0; 16],
             ram: [0; 4096],
-            keyboard: JavaScriptKeyboard::new(),
+            keyboard: Keyboard::new(),
             rng: Rng::new(getRandomSeed()),
         }
     }
@@ -292,7 +292,15 @@ impl Cpu {
         self.ram.as_ptr()
     }
 
-    pub fn keyboard(&self) -> JavaScriptKeyboard {
-        self.keyboard.clone()
+    pub fn get_keyboard_state(&self) -> u16 {
+        self.keyboard.get_state()
+    }
+
+    pub fn set_key_down(&mut self, key: u8) {
+        self.keyboard.set_key_down(key);
+    }
+
+    pub fn set_key_up(&mut self, key: u8) {
+        self.keyboard.set_key_up(key);
     }
 }

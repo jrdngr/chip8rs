@@ -1,4 +1,21 @@
 /* tslint:disable */
+export class Keyboard {
+free(): void;
+static  new(): Keyboard;
+
+ set_key_down(arg0: number): void;
+
+ set_key_up(arg0: number): void;
+
+ get_key_down(arg0: number): boolean;
+
+ any_keys_down(): boolean;
+
+ last_key_down(): number;
+
+ get_state(): number;
+
+}
 export class Cpu {
 free(): void;
 static  new(): Cpu;
@@ -25,11 +42,10 @@ static  new(): Cpu;
 
  ram(): number;
 
- keyboard(): JavaScriptKeyboard;
+ get_keyboard_state(): number;
 
-}
-export class JavaScriptKeyboard {
-free(): void;
-static  new(): JavaScriptKeyboard;
+ set_key_down(arg0: number): void;
+
+ set_key_up(arg0: number): void;
 
 }
