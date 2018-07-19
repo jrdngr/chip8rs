@@ -1,6 +1,6 @@
 use super::opcode::{ OpCode };
 use super::keyboard::{ Keyboard };
-use super::rng::{ generate_random };
+use super::rng::{ Rng };
 
 use std::io;
 use std::io::prelude::*;
@@ -14,7 +14,7 @@ extern "C" {
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
     #[wasm_bindgen(module = "./js/index")]
-    fn getRandomSeed() -> i64;
+    fn getRandomSeed() -> i32;
     #[wasm_bindgen(module = "./js/index")]
     fn setPixel(x: u8, y: u8);
     #[wasm_bindgen(module = "./js/index")]
@@ -32,6 +32,7 @@ pub struct Cpu {
     stack: [usize; 16],
     ram: [u8; 4096],
     keyboard: Keyboard,
+    rng: Rng,
 }
 
 impl Cpu {
@@ -39,12 +40,7 @@ impl Cpu {
         for (offset, byte) in rom.iter().enumerate() {
             self.ram[START_ADDRESS + offset] = *byte;
         }
-    }
-
-    fn get_current_opcode(&self) -> OpCode {
-        let first_byte = (self.ram[self.program_counter] as u16) << 8;
-        let second_byte = self.ram[self.program_counter + 1] as u16;
-        OpCode::from(first_byte | second_byte)
+        self.reset_program_counter();
     }
 
     pub fn process_opcode(&mut self, opcode: OpCode) {
@@ -154,7 +150,7 @@ impl Cpu {
                 self.program_counter = nnn + offset - 2;
             },
             OpCode::SetToRandom(x, nn) => {   
-                let random = generate_random(getRandomSeed()) & nn;
+                let random = self.rng.random_u8() & nn;
                 self.data_registers[x as usize] = random;
             },
             OpCode::DrawSprite(x, y, n) => {   
@@ -179,7 +175,7 @@ impl Cpu {
                 if self.keyboard.any_keys_down() {
                     self.data_registers[x as usize] = self.keyboard.last_key_down();
                 } else {
-                    self.program_counter() -= 2;
+                    self.program_counter -= 2;
                 }
             },
             OpCode::SetDelayTimer(x) => { 
@@ -214,6 +210,17 @@ impl Cpu {
             },
         }
     }
+    
+    fn get_current_opcode(&self) -> OpCode {
+        let first_byte = (self.ram[self.program_counter] as u16) << 8;
+        let second_byte = self.ram[self.program_counter + 1] as u16;
+        OpCode::from(first_byte | second_byte)
+    }
+
+    fn reset_program_counter(&mut self) {
+        self.program_counter = START_ADDRESS;
+    }
+
 }
 
 #[wasm_bindgen]
@@ -229,6 +236,7 @@ impl Cpu {
             stack: [0; 16],
             ram: [0; 4096],
             keyboard: Keyboard::new(),
+            rng: Rng::new(getRandomSeed()),
         }
     }
 

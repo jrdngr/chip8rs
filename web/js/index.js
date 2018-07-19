@@ -65,8 +65,16 @@ stackTable.border = "1px solid black";
 document.body.appendChild(stackTable);
 var stepButton = document.createElement("button");
 stepButton.innerText = "Step";
-stepButton.addEventListener("click", function () { return cpu.step(); });
+stepButton.addEventListener("click", stepCpu);
 document.body.appendChild(stepButton);
+document.addEventListener("keydown", function (event) {
+    if (event.keyCode == 32) {
+        stepCpu();
+    }
+});
+function stepCpu() {
+    cpu.step();
+}
 var REFRESH_RATE = 100;
 function updateCpuValues() {
     debugTable.pcv.innerHTML = cpu.program_counter().toString();
@@ -84,10 +92,8 @@ function updateCpuValues() {
 updateCpuValues();
 var canvas = document.getElementById("canvas");
 export function setPixel(x, y) {
-    console.log(x + " " + y);
 }
 export function clearScreen() {
-    console.log("clear");
 }
 export function getRandomSeed() {
 }

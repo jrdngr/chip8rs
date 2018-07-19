@@ -29,17 +29,8 @@ export function __wbg_f_log_log_n(arg0, arg1) {
     __wbg_f_log_log_n_target(varg0);
 }
 
-let cachegetInt64Memory = null;
-function getInt64Memory() {
-    if (cachegetInt64Memory === null ||
-        cachegetInt64Memory.buffer !== wasm.memory.buffer)
-        cachegetInt64Memory = new BigInt64Array(wasm.memory.buffer);
-    return cachegetInt64Memory;
-}
-
-export function __wbg_f_getRandomSeed_getRandomSeed_n(ret) {
-    const val = getRandomSeed();
-    getInt64Memory()[ret / 8] = val;
+export function __wbg_f_getRandomSeed_getRandomSeed_n() {
+    return getRandomSeed();
 }
 
 export function __wbg_f_setPixel_setPixel_n(arg0, arg1) {

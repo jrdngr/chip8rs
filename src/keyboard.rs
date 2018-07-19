@@ -5,7 +5,10 @@ pub struct Keyboard {
 
 impl Keyboard {
     pub fn new() -> Self {
-        Keyboard { state: 0 }
+        Keyboard { 
+            state: 0,
+            last_key_down: 0, 
+        }
     }
 
     pub fn key_down(&mut self, key: u8) {
@@ -22,7 +25,7 @@ impl Keyboard {
     }
 
     pub fn last_key_down(&self) -> u8 {
-        self.last
+        self.last_key_down
     }
 
     pub fn any_keys_down(&self) -> bool {
