@@ -25,4 +25,11 @@ static  new(): Cpu;
 
  ram(): number;
 
+ keyboard(): JavaScriptKeyboard;
+
+}
+export class JavaScriptKeyboard {
+free(): void;
+static  new(): JavaScriptKeyboard;
+
 }

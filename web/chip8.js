@@ -107,6 +107,29 @@ stack() {
 ram() {
     return wasm.cpu_ram(this.ptr);
 }
+keyboard() {
+    return JavaScriptKeyboard.__construct(wasm.cpu_keyboard(this.ptr));
+}
+}
+
+export class JavaScriptKeyboard {
+
+                static __construct(ptr) {
+                    return new JavaScriptKeyboard(ptr);
+                }
+
+                constructor(ptr) {
+                    this.ptr = ptr;
+                }
+
+            free() {
+                const ptr = this.ptr;
+                this.ptr = 0;
+                wasm.__wbg_javascriptkeyboard_free(ptr);
+            }
+        static new() {
+    return JavaScriptKeyboard.__construct(wasm.javascriptkeyboard_new());
+}
 }
 
 let slab = [];

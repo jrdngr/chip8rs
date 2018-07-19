@@ -1,39 +1,53 @@
-pub struct Keyboard {
+use wasm_bindgen::prelude::*;
+
+pub trait Keyboard {
+    fn set_key_down(&mut self, key: u8);
+    fn set_key_up(&mut self, key: u8);
+    fn get_key_down(&self, key: u8) -> bool;
+    fn any_keys_down(&self) -> bool;
+    fn last_key_down(&self) -> u8;
+    fn key_to_mask(key: u8) -> u16 {
+        1u16 << (key as u16 & 0x0Fu16)
+    }
+}
+
+#[wasm_bindgen]
+#[derive(Clone)]
+pub struct JavaScriptKeyboard {
     state: u16,
     last_key_down: u8,
 }
 
-impl Keyboard {
+#[wasm_bindgen]
+impl JavaScriptKeyboard {
     pub fn new() -> Self {
-        Keyboard { 
+        JavaScriptKeyboard { 
             state: 0,
-            last_key_down: 0, 
+            last_key_down: 0,
         }
     }
+}
 
-    pub fn key_down(&mut self, key: u8) {
-        self.state = self.state | Keyboard::key_to_mask(key);
+impl Keyboard for JavaScriptKeyboard {
+    fn set_key_down(&mut self, key: u8) {
+        self.state = self.state | JavaScriptKeyboard::key_to_mask(key);
         self.last_key_down = key;
     }
 
-    pub fn key_up(&mut self, key: u8) {
-        self.state = self.state & (!Keyboard::key_to_mask(key));
+    fn set_key_up(&mut self, key: u8) {
+        self.state = self.state & (!JavaScriptKeyboard::key_to_mask(key));
     }
 
-    pub fn is_key_down(&self, key: u8) -> bool {
+    fn get_key_down(&self, key: u8) -> bool {
         true
     }
 
-    pub fn last_key_down(&self) -> u8 {
-        self.last_key_down
-    }
-
-    pub fn any_keys_down(&self) -> bool {
+    fn any_keys_down(&self) -> bool {
         self.state != 0
     }
 
-    fn key_to_mask(key: u8) -> u16 {
-        1u16 << (key as u16 & 0x0F)
+    fn last_key_down(&self) -> u8 {
+        self.last_key_down
     }
 }
 

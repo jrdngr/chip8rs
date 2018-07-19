@@ -1,6 +1,6 @@
-use super::opcode::{ OpCode };
-use super::keyboard::{ Keyboard };
-use super::rng::{ Rng };
+use ::opcode::{ OpCode };
+use ::hardware::keyboard::{ Keyboard, JavaScriptKeyboard };
+use ::rng::{ Rng };
 
 use std::io;
 use std::io::prelude::*;
@@ -31,7 +31,7 @@ pub struct Cpu {
     data_registers: [u8; 16],
     stack: [usize; 16],
     ram: [u8; 4096],
-    keyboard: Keyboard,
+    keyboard: JavaScriptKeyboard,
     rng: Rng,
 }
 
@@ -158,13 +158,13 @@ impl Cpu {
             },
             OpCode::SkipIfKeyPressed(x) => { 
                 let key = self.data_registers[x as usize]; 
-                if self.keyboard.is_key_down(key) {
+                if self.keyboard.get_key_down(key) {
                     self.program_counter += 2;
                 }
             },
             OpCode::SkipIfKeyNotPressed(x) => { 
                 let key = self.data_registers[x as usize];  
-                if !self.keyboard.is_key_down(key) {
+                if !self.keyboard.get_key_down(key) {
                     self.program_counter += 2;
                 }
             },
@@ -235,7 +235,7 @@ impl Cpu {
             data_registers: [0; 16],
             stack: [0; 16],
             ram: [0; 4096],
-            keyboard: Keyboard::new(),
+            keyboard: JavaScriptKeyboard::new(),
             rng: Rng::new(getRandomSeed()),
         }
     }
@@ -292,4 +292,7 @@ impl Cpu {
         self.ram.as_ptr()
     }
 
+    pub fn keyboard(&self) -> JavaScriptKeyboard {
+        self.keyboard.clone()
+    }
 }
