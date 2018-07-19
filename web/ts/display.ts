@@ -1,4 +1,4 @@
-const PIXEL_SIZE = 5;
+const PIXEL_SIZE = 20;
 const PIXEL_ON_COLOR = "#000000";
 const PIXEL_OFF_COLOR = "#FFFFFF";
 
@@ -9,7 +9,7 @@ export class Display {
     
     constructor(private readonly width: number, 
                 private readonly height: number, 
-                private readonly canvas: HTMLCanvasElement) 
+                canvas: HTMLCanvasElement)
     {
         this.ctx = canvas.getContext('2d');
         canvas.width = PIXEL_SIZE * width;
@@ -21,38 +21,39 @@ export class Display {
     }
 
     public setPixel(x: number, y: number) {
-        const index =this.getIndex(x, y);
+        const index = this.getIndex(x, y);
         const current = this.pixels[index];
         if (!current) {
             this.pixels[index] = true;
         } else {
             this.pixels[index] = false;
         }
+        
+        this.drawPixel(x, y, this.pixels[index]);
     }
 
     public clear() {
-        this.pixels.forEach(pixel => pixel = false);
+        for (let row = 0; row < this.width; row++) {
+            for (let col = 0; col < this.height; col++) {
+                let index = this.getIndex(row, col);
+                this.pixels[index] = false;
+                this.drawPixel(row, col, false);
+            }
+        }
     }
 
-    public draw() {
+    private drawPixel(x: number, y: number, isOn: boolean) {
         this.ctx.beginPath();
-      
-        for (let row = 0; row < this.height; row++) {
-          for (let col = 0; col < this.width; col++) {
-            const index = this.getIndex(row, col);
-      
-            this.ctx.fillStyle = this.pixels[index]
-              ? PIXEL_OFF_COLOR
-              : PIXEL_ON_COLOR;
-      
-            this.ctx.fillRect(
-              col * PIXEL_SIZE,
-              row * PIXEL_SIZE,
-              PIXEL_SIZE,
-              PIXEL_SIZE
-            );
-          }
-        }
+        this.ctx.fillStyle = isOn
+            ? PIXEL_ON_COLOR
+            : PIXEL_OFF_COLOR;
+    
+        this.ctx.fillRect(
+            x * PIXEL_SIZE,
+            y * PIXEL_SIZE,
+            PIXEL_SIZE,
+            PIXEL_SIZE
+        );
     }
 
     private getIndex(x: number, y: number): number {

@@ -122,8 +122,6 @@ function update() {
         stackValues[i].innerHTML = stack[i].toString();
     }
 
-    display.draw();
-
     setTimeout(update, REFRESH_RATE);
 }
 

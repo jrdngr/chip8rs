@@ -154,7 +154,15 @@ impl Cpu {
                 self.data_registers[x as usize] = random;
             },
             OpCode::DrawSprite(x, y, n) => {   
-                setPixel(x, y);
+                for y_offset in (0..n) {
+                    let byte = self.ram[self.i_register + y_offset as usize];
+                    let bits = Cpu::get_bits(byte);
+                    for x_offset in (0..bits.len() as u8) {
+                        if bits[x_offset as usize] {
+                            setPixel(x + x_offset, y + y_offset);
+                        }
+                    }
+                }
             },
             OpCode::SkipIfKeyPressed(x) => { 
                 let key = self.data_registers[x as usize]; 
@@ -221,6 +229,18 @@ impl Cpu {
         self.program_counter = START_ADDRESS;
     }
 
+    fn get_bits(byte: u8) -> [bool; 8] {
+        [
+            (byte & 0b10000000) >> 7 == 1,
+            (byte & 0b01000000) >> 6 == 1,
+            (byte & 0b00100000) >> 5 == 1,
+            (byte & 0b00010000) >> 4 == 1,
+            (byte & 0b00001000) >> 3 == 1,
+            (byte & 0b00000100) >> 2 == 1,
+            (byte & 0b00000010) >> 1 == 1,
+            byte & 0b00000001 == 1,
+        ]
+    }
 }
 
 #[wasm_bindgen]
