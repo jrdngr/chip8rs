@@ -55,44 +55,6 @@ function passArray8ToWasm(arg) {
     return [ptr, arg.length];
 }
 
-export class Keyboard {
-
-                static __construct(ptr) {
-                    return new Keyboard(ptr);
-                }
-
-                constructor(ptr) {
-                    this.ptr = ptr;
-                }
-
-            free() {
-                const ptr = this.ptr;
-                this.ptr = 0;
-                wasm.__wbg_keyboard_free(ptr);
-            }
-        static new() {
-    return Keyboard.__construct(wasm.keyboard_new());
-}
-set_key_down(arg0) {
-    return wasm.keyboard_set_key_down(this.ptr, arg0);
-}
-set_key_up(arg0) {
-    return wasm.keyboard_set_key_up(this.ptr, arg0);
-}
-get_key_down(arg0) {
-    return (wasm.keyboard_get_key_down(this.ptr, arg0)) !== 0;
-}
-any_keys_down() {
-    return (wasm.keyboard_any_keys_down(this.ptr)) !== 0;
-}
-last_key_down() {
-    return wasm.keyboard_last_key_down(this.ptr);
-}
-get_state() {
-    return wasm.keyboard_get_state(this.ptr);
-}
-}
-
 export class Cpu {
 
                 static __construct(ptr) {
@@ -156,146 +118,42 @@ set_key_up(arg0) {
 }
 }
 
-let slab = [];
+export class Keyboard {
 
-let slab_next = 0;
+                static __construct(ptr) {
+                    return new Keyboard(ptr);
+                }
 
-function addHeapObject(obj) {
-    if (slab_next === slab.length)
-        slab.push(slab.length + 1);
-    const idx = slab_next;
-    const next = slab[idx];
+                constructor(ptr) {
+                    this.ptr = ptr;
+                }
 
-    slab_next = next;
-
-    slab[idx] = { obj, cnt: 1 };
-    return idx << 1;
+            free() {
+                const ptr = this.ptr;
+                this.ptr = 0;
+                wasm.__wbg_keyboard_free(ptr);
+            }
+        static new() {
+    return Keyboard.__construct(wasm.keyboard_new());
 }
-
-let stack = [];
-
-function getObject(idx) {
-    if ((idx & 1) === 1) {
-        return stack[idx >> 1];
-    } else {
-        const val = slab[idx >> 1];
-
-    return val.obj;
-
-    }
+set_key_down(arg0) {
+    return wasm.keyboard_set_key_down(this.ptr, arg0);
 }
-
-export function __wbindgen_object_clone_ref(idx) {
-    // If this object is on the stack promote it to the heap.
-    if ((idx & 1) === 1)
-        return addHeapObject(getObject(idx));
-
-    // Otherwise if the object is on the heap just bump the
-    // refcount and move on
-    const val = slab[idx >> 1];
-    val.cnt += 1;
-    return idx;
+set_key_up(arg0) {
+    return wasm.keyboard_set_key_up(this.ptr, arg0);
 }
-
-function dropRef(idx) {
-
-    let obj = slab[idx >> 1];
-
-    obj.cnt -= 1;
-    if (obj.cnt > 0)
-        return;
-
-    // If we hit 0 then free up our space in the slab
-    slab[idx >> 1] = slab_next;
-    slab_next = idx >> 1;
+get_key_down(arg0) {
+    return (wasm.keyboard_get_key_down(this.ptr, arg0)) !== 0;
 }
-
-export function __wbindgen_object_drop_ref(i) { dropRef(i); }
-
-export function __wbindgen_string_new(p, l) {
-    return addHeapObject(getStringFromWasm(p, l));
+any_keys_down() {
+    return (wasm.keyboard_any_keys_down(this.ptr)) !== 0;
 }
-
-export function __wbindgen_number_new(i) { return addHeapObject(i); }
-
-export function __wbindgen_number_get(n, invalid) {
-    let obj = getObject(n);
-    if (typeof(obj) === 'number')
-        return obj;
-    getUint8Memory()[invalid] = 1;
-    return 0;
+last_key_down() {
+    return wasm.keyboard_last_key_down(this.ptr);
 }
-
-export function __wbindgen_undefined_new() { return addHeapObject(undefined); }
-
-export function __wbindgen_null_new() {
-    return addHeapObject(null);
+get_state() {
+    return wasm.keyboard_get_state(this.ptr);
 }
-
-export function __wbindgen_is_null(idx) {
-    return getObject(idx) === null ? 1 : 0;
-}
-
-export function __wbindgen_is_undefined(idx) {
-    return getObject(idx) === undefined ? 1 : 0;
-}
-
-export function __wbindgen_boolean_new(v) {
-    return addHeapObject(v === 1);
-}
-
-export function __wbindgen_boolean_get(i) {
-    let v = getObject(i);
-    if (typeof(v) === 'boolean') {
-        return v ? 1 : 0;
-    } else {
-        return 2;
-    }
-}
-
-export function __wbindgen_symbol_new(ptr, len) {
-    let a;
-    if (ptr === 0) {
-        a = Symbol();
-    } else {
-        a = Symbol(getStringFromWasm(ptr, len));
-    }
-    return addHeapObject(a);
-}
-
-export function __wbindgen_is_symbol(i) {
-    return typeof(getObject(i)) === 'symbol' ? 1 : 0;
-}
-
-const TextEncoder = typeof self === 'object' && self.TextEncoder
-    ? self.TextEncoder
-    : require('util').TextEncoder;
-
-let cachedEncoder = new TextEncoder('utf-8');
-
-function passStringToWasm(arg) {
-
-    const buf = cachedEncoder.encode(arg);
-    const ptr = wasm.__wbindgen_malloc(buf.length);
-    getUint8Memory().set(buf, ptr);
-    return [ptr, buf.length];
-}
-
-let cachegetUint32Memory = null;
-function getUint32Memory() {
-    if (cachegetUint32Memory === null ||
-        cachegetUint32Memory.buffer !== wasm.memory.buffer)
-        cachegetUint32Memory = new Uint32Array(wasm.memory.buffer);
-    return cachegetUint32Memory;
-}
-
-export function __wbindgen_string_get(i, len_ptr) {
-    let obj = getObject(i);
-    if (typeof(obj) !== 'string')
-        return 0;
-    const [ptr, len] = passStringToWasm(obj);
-    getUint32Memory()[len_ptr / 4] = len;
-    return ptr;
 }
 
 export function __wbindgen_throw(ptr, len) {

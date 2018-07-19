@@ -2,7 +2,10 @@
 import { Cpu } from "../chip8";
 // @ts-ignore
 import { memory } from "../chip8_bg";
+import { Display } from "./display";
 var cpu = Cpu.new();
+var canvas = document.getElementById("screen-canvas");
+var display = new Display(64, 32, canvas);
 function toArray(ptr) {
     return new Uint8Array(memory.buffer, ptr, 16);
 }
@@ -84,7 +87,7 @@ function stepCpu() {
     cpu.step();
 }
 var REFRESH_RATE = 100;
-function updateCpuValues() {
+function update() {
     debugTable.pcv.innerHTML = cpu.program_counter().toString();
     debugTable.spv.innerHTML = cpu.stack_pointer().toString();
     debugTable.dtv.innerHTML = cpu.delay_timer().toString();
@@ -96,13 +99,17 @@ function updateCpuValues() {
         registerValues[i].innerHTML = registers[i].toString();
         stackValues[i].innerHTML = stack[i].toString();
     }
-    setTimeout(updateCpuValues, REFRESH_RATE);
+    display.draw();
+    setTimeout(update, REFRESH_RATE);
 }
-updateCpuValues();
-var canvas = document.getElementById("canvas");
+update();
 export function setPixel(x, y) {
+    display.setPixel(x, y);
 }
 export function clearScreen() {
+    display.clear();
 }
+var MAX_INT = 2147483647;
 export function getRandomSeed() {
+    return Math.floor(Math.random() * MAX_INT);
 }
