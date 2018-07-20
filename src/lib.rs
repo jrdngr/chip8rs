@@ -1,4 +1,4 @@
-#![feature(use_extern_macros, proc_macro, wasm_custom_section, wasm_import_module)]
+#![feature(rust_2018_preview, use_extern_macros, wasm_custom_section, wasm_import_module)]
 
 extern crate wasm_bindgen;
 

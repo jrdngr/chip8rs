@@ -1,6 +1,6 @@
-use ::opcode::{ OpCode };
-use ::hardware::keyboard::{ Keyboard };
-use ::rng::{ Rng };
+use crate::opcode::{ OpCode };
+use crate::hardware::keyboard::{ Keyboard };
+use crate::rng::{ Rng };
 
 use wasm_bindgen::prelude::*;
 
