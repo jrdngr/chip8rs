@@ -3,3 +3,4 @@
 Cargo.lock
 web/node_modules
 web/js
+web/dist
