@@ -33,16 +33,10 @@ pub struct Cpu {
     ram: [u8; 4096],
     keyboard: Keyboard,
     rng: Rng,
+    is_paused: bool,
 }
 
 impl Cpu {
-    pub fn load(&mut self, rom: &Vec<u8>) {
-        for (offset, byte) in rom.iter().enumerate() {
-            self.ram[START_ADDRESS + offset] = *byte;
-        }
-        self.reset_program_counter();
-    }
-
     pub fn process_opcode(&mut self, opcode: OpCode) {
         match opcode {
             OpCode::ExecuteMachineSubroutine(nnn) => { /* Not implemented */ },
@@ -154,12 +148,14 @@ impl Cpu {
                 self.data_registers[x as usize] = random;
             },
             OpCode::DrawSprite(x, y, n) => {   
+                let vx = self.data_registers[x as usize];
+                let vy = self.data_registers[y as usize];
                 for y_offset in (0..n) {
                     let byte = self.ram[self.i_register + y_offset as usize];
                     let bits = Cpu::get_bits(byte);
                     for x_offset in (0..bits.len() as u8) {
                         if bits[x_offset as usize] {
-                            setPixel(x + x_offset, y + y_offset);
+                            setPixel(vx + x_offset, vy + y_offset);
                         }
                     }
                 }
@@ -218,6 +214,20 @@ impl Cpu {
             },
         }
     }
+
+    pub fn load(&mut self, rom: &Vec<u8>) {
+        for (offset, byte) in rom.iter().enumerate() {
+            self.ram[START_ADDRESS + offset] = *byte;
+        }
+        self.reset_program_counter();
+        self.is_paused = false;
+    }
+
+    fn next_op(&mut self) {
+        let next_op = self.get_current_opcode();
+        self.process_opcode(next_op);
+        self.program_counter += 2;
+    }
     
     fn get_current_opcode(&self) -> OpCode {
         let first_byte = (self.ram[self.program_counter] as u16) << 8;
@@ -257,27 +267,25 @@ impl Cpu {
             ram: [0; 4096],
             keyboard: Keyboard::new(),
             rng: Rng::new(getRandomSeed()),
+            is_paused: true,
         }
     }
 
     pub fn load_from_web(&mut self, rom: Vec<u8>) {
-        for (offset, byte) in rom.iter().enumerate() {
-            self.ram[START_ADDRESS + offset] = *byte;
-        }
+        self.load(&rom);
     }
 
     pub fn start(&mut self) {
         let max = self.ram.len() - 1;
         while self.program_counter < max {
-            self.step();
+            self.next_op();
         }
     }
 
     pub fn step(&mut self) {
         let next_op = self.get_current_opcode();
         log(&format!("{:?}", next_op));
-        self.process_opcode(next_op);
-        self.program_counter += 2;
+        self.next_op();
     }
 
     pub fn program_counter(&self) -> usize {

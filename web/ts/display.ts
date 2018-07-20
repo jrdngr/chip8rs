@@ -1,4 +1,4 @@
-const PIXEL_SIZE = 20;
+const PIXEL_SIZE = 15;
 const PIXEL_ON_COLOR = "#000000";
 const PIXEL_OFF_COLOR = "#FFFFFF";
 

@@ -14,7 +14,7 @@ function toArray(ptr: number) {
 }
 
 document.addEventListener("keydown", function(event) {
-    if (event.key == " ") {
+    if (event.key == "s") {
         stepCpu();
     } else {
         cpu.set_key_down(parseInt(event.key, 16));
@@ -98,7 +98,11 @@ stepButton.innerText = "Step";
 stepButton.addEventListener("click", stepCpu);
 document.body.appendChild(stepButton);
 
-
+const startButton = document.createElement("button");
+startButton.innerText = "Start";
+startButton.addEventListener("click", () => cpu.start());
+startButton.disabled = true;
+document.body.appendChild(startButton);
 
 function stepCpu() {
     cpu.step();
@@ -126,6 +130,13 @@ function update() {
 }
 
 update();
+
+function loop() {
+    stepCpu();
+    requestAnimationFrame(loop);
+}
+
+//requestAnimationFrame(loop);
 
 
 export function setPixel(x: number, y: number) {
