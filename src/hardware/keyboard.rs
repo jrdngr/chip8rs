@@ -1,5 +1,5 @@
 use wasm_bindgen::prelude::*;
-use ::hardware::cpu::{ log };
+//use ::hardware::cpu::{ log };
 
 #[wasm_bindgen]
 pub struct Keyboard {

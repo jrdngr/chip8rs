@@ -55,44 +55,6 @@ function passArray8ToWasm(arg) {
     return [ptr, arg.length];
 }
 
-export class Keyboard {
-
-                static __construct(ptr) {
-                    return new Keyboard(ptr);
-                }
-
-                constructor(ptr) {
-                    this.ptr = ptr;
-                }
-
-            free() {
-                const ptr = this.ptr;
-                this.ptr = 0;
-                wasm.__wbg_keyboard_free(ptr);
-            }
-        static new() {
-    return Keyboard.__construct(wasm.keyboard_new());
-}
-set_key_down(arg0) {
-    return wasm.keyboard_set_key_down(this.ptr, arg0);
-}
-set_key_up(arg0) {
-    return wasm.keyboard_set_key_up(this.ptr, arg0);
-}
-get_key_down(arg0) {
-    return (wasm.keyboard_get_key_down(this.ptr, arg0)) !== 0;
-}
-any_keys_down() {
-    return (wasm.keyboard_any_keys_down(this.ptr)) !== 0;
-}
-last_key_down() {
-    return wasm.keyboard_last_key_down(this.ptr);
-}
-get_state() {
-    return wasm.keyboard_get_state(this.ptr);
-}
-}
-
 export class Cpu {
 
                 static __construct(ptr) {
@@ -153,6 +115,44 @@ set_key_down(arg0) {
 }
 set_key_up(arg0) {
     return wasm.cpu_set_key_up(this.ptr, arg0);
+}
+}
+
+export class Keyboard {
+
+                static __construct(ptr) {
+                    return new Keyboard(ptr);
+                }
+
+                constructor(ptr) {
+                    this.ptr = ptr;
+                }
+
+            free() {
+                const ptr = this.ptr;
+                this.ptr = 0;
+                wasm.__wbg_keyboard_free(ptr);
+            }
+        static new() {
+    return Keyboard.__construct(wasm.keyboard_new());
+}
+set_key_down(arg0) {
+    return wasm.keyboard_set_key_down(this.ptr, arg0);
+}
+set_key_up(arg0) {
+    return wasm.keyboard_set_key_up(this.ptr, arg0);
+}
+get_key_down(arg0) {
+    return (wasm.keyboard_get_key_down(this.ptr, arg0)) !== 0;
+}
+any_keys_down() {
+    return (wasm.keyboard_any_keys_down(this.ptr)) !== 0;
+}
+last_key_down() {
+    return wasm.keyboard_last_key_down(this.ptr);
+}
+get_state() {
+    return wasm.keyboard_get_state(this.ptr);
 }
 }
 

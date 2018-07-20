@@ -34,6 +34,7 @@ fileButton.onchange = function(event: any) {
         var fileBytes = new Uint8Array(arrayBuffer);
         cpu.load_from_web(fileBytes);
         console.log("Loaded " + file.name);
+        display.clear();
     };
     reader.readAsArrayBuffer(file);
 }

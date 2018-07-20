@@ -2,9 +2,6 @@ use ::opcode::{ OpCode };
 use ::hardware::keyboard::{ Keyboard };
 use ::rng::{ Rng };
 
-use std::io;
-use std::io::prelude::*;
-
 use wasm_bindgen::prelude::*;
 
 const START_ADDRESS: usize = 512;
@@ -150,10 +147,10 @@ impl Cpu {
             OpCode::DrawSprite(x, y, n) => {   
                 let vx = self.data_registers[x as usize];
                 let vy = self.data_registers[y as usize];
-                for y_offset in (0..n) {
+                for y_offset in 0..n {
                     let byte = self.ram[self.i_register + y_offset as usize];
                     let bits = Cpu::get_bits(byte);
-                    for x_offset in (0..bits.len() as u8) {
+                    for x_offset in 0..bits.len() as u8 {
                         if bits[x_offset as usize] {
                             setPixel(vx + x_offset, vy + y_offset);
                         }
@@ -192,7 +189,8 @@ impl Cpu {
                 self.i_register += self.data_registers[x as usize] as usize; 
             },
             OpCode::SetIToHexSprite(x) => { 
-
+                let value = self.data_registers[x as usize];
+                self.i_register = 5 * value as usize;
             },
             OpCode::StoreDecimal(x) => {   
                 let vx = self.data_registers[x as usize];
@@ -256,6 +254,11 @@ impl Cpu {
 #[wasm_bindgen]
 impl Cpu {
     pub fn new() -> Self {
+        let mut ram = [0; 4096];
+        for (index, byte) in HEX_SPRITES.iter().enumerate() {
+            ram[index] = *byte;
+        }
+     
         Cpu {
             program_counter: START_ADDRESS,
             stack_pointer: 0,
@@ -264,10 +267,10 @@ impl Cpu {
             i_register: 0,
             data_registers: [0; 16],
             stack: [0; 16],
-            ram: [0; 4096],
             keyboard: Keyboard::new(),
             rng: Rng::new(getRandomSeed()),
             is_paused: true,
+            ram,
         }
     }
 
@@ -332,3 +335,102 @@ impl Cpu {
         self.keyboard.set_key_up(key);
     }
 }
+
+
+const HEX_SPRITES: [u8; 5 * 16] = [
+        0b11110000,
+        0b10010000,
+        0b10010000,
+        0b10010000,
+        0b11110000,
+
+        0b00100000,
+        0b01100000,
+        0b00100000,
+        0b00100000,
+        0b01110000,
+
+        0b11110000,
+        0b00010000,
+        0b11110000,
+        0b10000000,
+        0b11110000,
+
+        0b11110000,
+        0b00010000,
+        0b11110000,
+        0b00010000,
+        0b11110000,
+
+        0b10010000,
+        0b10010000,
+        0b11110000,
+        0b00010000,
+        0b00010000,
+
+        0b11110000,
+        0b10000000,
+        0b11110000,
+        0b00010000,
+        0b11110000,
+
+        0b11110000,
+        0b10000000,
+        0b11110000,
+        0b10010000,
+        0b11110000,
+
+        0b11110000,
+        0b00010000,
+        0b00100000,
+        0b01000000,
+        0b01000000,
+
+        0b11110000,
+        0b10010000,
+        0b11110000,
+        0b10010000,
+        0b11110000,
+
+        0b11110000,
+        0b10010000,
+        0b11110000,
+        0b00010000,
+        0b11110000,
+
+        0b11110000,
+        0b10010000,
+        0b11110000,
+        0b10010000,
+        0b10010000,
+
+        0b11100000,
+        0b10010000,
+        0b11100000,
+        0b10010000,
+        0b11100000,
+
+        0b11110000,
+        0b10000000,
+        0b10000000,
+        0b10000000,
+        0b11110000,
+
+        0b11100000,
+        0b10010000,
+        0b10010000,
+        0b10010000,
+        0b11100000,
+
+        0b11110000,
+        0b10000000,
+        0b11110000,
+        0b10000000,
+        0b11110000,
+
+        0b11110000,
+        0b10000000,
+        0b11110000,
+        0b10000000,
+        0b10000000,
+];
