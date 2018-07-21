@@ -53,82 +53,82 @@ impl Cpu {
                 self.program_counter = nnn;
             },
             OpCode::SkipIfEqualValue(x, nn) => {   
-                let vx = self.data_registers[x as usize];
+                let vx = self.data_registers[x];
                 if vx == nn {
                     self.program_counter += 2;
                 }
             },
             OpCode::SkipIfNotEqualValue(x, nn) => {   
-                let vx = self.data_registers[x as usize];
+                let vx = self.data_registers[x];
                 if vx != nn {
                     self.program_counter += 2;
                 }
             },
             OpCode::SkipIfEqualRegister(x, y) => {   
-                let vx = self.data_registers[x as usize];
-                let vy = self.data_registers[y as usize];
+                let vx = self.data_registers[x];
+                let vy = self.data_registers[y];
                 if vx == vy {
                     self.program_counter += 2;
                 }
             },
             OpCode::StoreValue(x, nn) => { 
-                self.data_registers[x as usize] = nn; 
+                self.data_registers[x] = nn; 
             },
             OpCode::AddValue(x, nn) => { 
-                self.data_registers[x as usize] += nn; 
+                self.data_registers[x] += nn; 
             },
             OpCode::StoreRegister(x, y) => { 
-                self.data_registers[x as usize] = self.data_registers[y as usize]; 
+                self.data_registers[x] = self.data_registers[y]; 
             },
             OpCode::Or(x, y) => {  
-                let vx = self.data_registers[x as usize];
-                let vy = self.data_registers[y as usize];
-                self.data_registers[x as usize] = vx | vy;
+                let vx = self.data_registers[x];
+                let vy = self.data_registers[y];
+                self.data_registers[x] = vx | vy;
             },
             OpCode::And(x, y) => {
-                let vx = self.data_registers[x as usize];
-                let vy = self.data_registers[y as usize];
-                self.data_registers[x as usize] = vx & vy;
+                let vx = self.data_registers[x];
+                let vy = self.data_registers[y];
+                self.data_registers[x] = vx & vy;
             },
             OpCode::Xor(x, y) => {
-                let vx = self.data_registers[x as usize];
-                let vy = self.data_registers[y as usize];
-                self.data_registers[x as usize] = vx ^ vy;
+                let vx = self.data_registers[x];
+                let vy = self.data_registers[y];
+                self.data_registers[x] = vx ^ vy;
             },
             OpCode::AddRegister(x, y) => { 
-                let vx = self.data_registers[x as usize];
-                let vy = self.data_registers[y as usize];
+                let vx = self.data_registers[x];
+                let vy = self.data_registers[y];
                 let (sum, overflowed) = vx.overflowing_add(vy);
-                self.data_registers[x as usize] = sum;
+                self.data_registers[x] = sum;
                 self.data_registers[15] = if overflowed { 1 } else { 0 };
             },
             OpCode::SubtractRegister(x, y) => { 
-                let vx = self.data_registers[x as usize];
-                let vy = self.data_registers[y as usize];
+                let vx = self.data_registers[x];
+                let vy = self.data_registers[y];
                 let (sum, overflowed) = vx.overflowing_sub(vy);
-                self.data_registers[x as usize] = sum;
+                self.data_registers[x] = sum;
                 self.data_registers[15] = if overflowed { 0 } else { 1 };
             },
             OpCode::ShiftRight(x, y) => {
-                let vy = self.data_registers[y as usize];
+                let vy = self.data_registers[y];
                 self.data_registers[15] = vy & 1;
-                self.data_registers[x as usize] = vy >> 1;
+                self.data_registers[x] = vy >> 1;
             },
             OpCode::SubtractRegisterReverse(x, y) => {
-                let vx = self.data_registers[x as usize];
-                let vy = self.data_registers[y as usize];
+                let vx = self.data_registers[x];
+                let vy = self.data_registers[y];
                 let (sum, overflowed) = vy.overflowing_sub(vx);
-                self.data_registers[x as usize] = sum;
+                self.data_registers[x] = sum;
                 self.data_registers[15] = if overflowed { 0 } else { 1 };
             },
             OpCode::ShiftLeft(x, y) => {
-                let vy = self.data_registers[y as usize];
+                let vy = self.data_registers[y];
                 self.data_registers[15] = (vy >> 7) & 1;
-                self.data_registers[x as usize] = vy << 1;
+                self.data_registers[x] = vy << 1;
             },
             OpCode::SkipIfNotEqualRegister(x, y) => {   
-                let vx = self.data_registers[x as usize];
-                let vy = self.data_registers[y as usize];
+                let vx = self.data_registers[x];
+                let vy = self.data_registers[y];
                 if vx != vy {
                     self.program_counter += 1;
                 }
@@ -142,11 +142,11 @@ impl Cpu {
             },
             OpCode::SetToRandom(x, nn) => {   
                 let random = self.rng.random_u8() & nn;
-                self.data_registers[x as usize] = random;
+                self.data_registers[x] = random;
             },
             OpCode::DrawSprite(x, y, n) => {   
-                let vx = self.data_registers[x as usize];
-                let vy = self.data_registers[y as usize];
+                let vx = self.data_registers[x];
+                let vy = self.data_registers[y];
                 for y_offset in 0..n {
                     let byte = self.ram[self.i_register + y_offset as usize];
                     let bits = Cpu::get_bits(byte);
@@ -158,42 +158,42 @@ impl Cpu {
                 }
             },
             OpCode::SkipIfKeyPressed(x) => { 
-                let key = self.data_registers[x as usize]; 
+                let key = self.data_registers[x]; 
                 if self.keyboard.get_key_down(key) {
                     self.program_counter += 2;
                 }
             },
             OpCode::SkipIfKeyNotPressed(x) => { 
-                let key = self.data_registers[x as usize];  
+                let key = self.data_registers[x];  
                 if !self.keyboard.get_key_down(key) {
                     self.program_counter += 2;
                 }
             },
             OpCode::StoreDelayTimer(x) => { 
-                self.data_registers[x as usize] = self.delay_timer; 
+                self.data_registers[x] = self.delay_timer; 
             },
             OpCode::WaitAndStoreKey(x) => { 
                 if self.keyboard.any_keys_down() {
-                    self.data_registers[x as usize] = self.keyboard.last_key_down();
+                    self.data_registers[x] = self.keyboard.last_key_down();
                 } else {
                     self.program_counter -= 2;
                 }
             },
             OpCode::SetDelayTimer(x) => { 
-                self.delay_timer = self.data_registers[x as usize]; 
+                self.delay_timer = self.data_registers[x]; 
             },
             OpCode::SetSoundTimer(x) => { 
-                self.sound_timer = self.data_registers[x as usize]; 
+                self.sound_timer = self.data_registers[x]; 
             },
             OpCode::AddToRegisterI(x) => { 
-                self.i_register += self.data_registers[x as usize] as usize; 
+                self.i_register += self.data_registers[x] as usize; 
             },
             OpCode::SetIToHexSprite(x) => { 
-                let value = self.data_registers[x as usize];
+                let value = self.data_registers[x];
                 self.i_register = 5 * value as usize;
             },
             OpCode::StoreDecimal(x) => {   
-                let vx = self.data_registers[x as usize];
+                let vx = self.data_registers[x];
                 self.ram[self.i_register] = vx / 100;
                 self.ram[self.i_register + 1] = (vx / 10) % 10;
                 self.ram[self.i_register + 2] = vx % 10;
@@ -206,7 +206,7 @@ impl Cpu {
             },
             OpCode::FillRegisters(x) => {   
                for register in 0..x {
-                   self.data_registers[register as usize] = self.ram[self.i_register];
+                   self.data_registers[register] = self.ram[self.i_register];
                    self.i_register += 1;
                } 
             },
@@ -225,6 +225,8 @@ impl Cpu {
         let next_op = self.get_current_opcode();
         self.process_opcode(next_op);
         self.program_counter += 2;
+        if self.delay_timer > 0 { self.delay_timer -= 1 };
+        if self.sound_timer > 0 { self.sound_timer -= 1 };
     }
     
     fn get_current_opcode(&self) -> OpCode {

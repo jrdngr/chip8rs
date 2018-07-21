@@ -1,40 +1,40 @@
 #[derive(Debug, PartialEq, Clone)]
 pub enum OpCode {
-    ExecuteMachineSubroutine(usize),// 0NNN
-    ClearScreen,                    // 00E0
-    ReturnFromSubroutine,           // 00EE
-    JumpTo(usize),                  // 1NNN
-    ExecuteSubroutine(usize),       // 2NNN
-    SkipIfEqualValue(u8, u8),       // 3XNN
-    SkipIfNotEqualValue(u8, u8),    // 4XNN
-    SkipIfEqualRegister(u8, u8),    // 5XY0
-    StoreValue(u8, u8),             // 6XNN
-    AddValue(u8, u8),               // 7XNN
-    StoreRegister(u8, u8),          // 8XY0
-    Or(u8, u8),                     // 8XY1
-    And(u8, u8),                    // 8XY2
-    Xor(u8, u8),                    // 8XY3
-    AddRegister(u8, u8),            // 8XY4
-    SubtractRegister(u8, u8),       // 8XY5
-    ShiftRight(u8, u8),             // 8XY6
-    SubtractRegisterReverse(u8, u8),// 8XY7
-    ShiftLeft(u8, u8),              // 8XYE
-    SkipIfNotEqualRegister(u8, u8), // 9XY0
-    StoreInI(usize),                // ANNN
-    JumpWithOffset(usize),          // BNNN
-    SetToRandom(u8, u8),            // CXNN
-    DrawSprite(u8, u8, u8),         // DXYN
-    SkipIfKeyPressed(u8),           // EX9E
-    SkipIfKeyNotPressed(u8),        // EXA1
-    StoreDelayTimer(u8),            // FX07
-    WaitAndStoreKey(u8),            // FX0A
-    SetDelayTimer(u8),              // FX15
-    SetSoundTimer(u8),              // FX18
-    AddToRegisterI(u8),             // FX1E
-    SetIToHexSprite(u8),            // FX29
-    StoreDecimal(u8),               // FX33
-    StoreRegisters(u8),             // FX55
-    FillRegisters(u8),              // FX65
+    ExecuteMachineSubroutine(usize),        // 0NNN
+    ClearScreen,                            // 00E0
+    ReturnFromSubroutine,                   // 00EE
+    JumpTo(usize),                          // 1NNN
+    ExecuteSubroutine(usize),               // 2NNN
+    SkipIfEqualValue(usize, u8),            // 3XNN
+    SkipIfNotEqualValue(usize, u8),         // 4XNN
+    SkipIfEqualRegister(usize, usize),      // 5XY0
+    StoreValue(usize, u8),                  // 6XNN
+    AddValue(usize, u8),                    // 7XNN
+    StoreRegister(usize, usize),            // 8XY0
+    Or(usize, usize),                       // 8XY1
+    And(usize, usize),                      // 8XY2
+    Xor(usize, usize),                      // 8XY3
+    AddRegister(usize, usize),              // 8XY4
+    SubtractRegister(usize, usize),         // 8XY5
+    ShiftRight(usize, usize),               // 8XY6
+    SubtractRegisterReverse(usize, usize),  // 8XY7
+    ShiftLeft(usize, usize),                // 8XYE
+    SkipIfNotEqualRegister(usize, usize),   // 9XY0
+    StoreInI(usize),                        // ANNN
+    JumpWithOffset(usize),                  // BNNN
+    SetToRandom(usize, u8),                 // CXNN
+    DrawSprite(usize, usize, u8),           // DXYN
+    SkipIfKeyPressed(usize),                // EX9E
+    SkipIfKeyNotPressed(usize),             // EXA1
+    StoreDelayTimer(usize),                 // FX07
+    WaitAndStoreKey(usize),                 // FX0A
+    SetDelayTimer(usize),                   // FX15
+    SetSoundTimer(usize),                   // FX18
+    AddToRegisterI(usize),                  // FX1E
+    SetIToHexSprite(usize),                 // FX29
+    StoreDecimal(usize),                    // FX33
+    StoreRegisters(usize),                  // FX55
+    FillRegisters(usize),                   // FX65
 }
 
 impl From<u16> for OpCode {
@@ -98,8 +98,8 @@ impl From<u16> for OpCode {
     }
 }
 
-fn get_hex_digits(value: u16) -> (u8, u8, u8, u8) {
-    (((value & 0xF000) >> 12) as u8, ((value & 0x0F00) >> 8) as u8, ((value & 0x00F0) >> 4) as u8, (value & 0x000F) as u8)
+fn get_hex_digits(value: u16) -> (u8, usize, usize, u8) {
+    (((value & 0xF000) >> 12) as u8, ((value & 0x0F00) >> 8) as usize, ((value & 0x00F0) >> 4) as usize, (value & 0x000F) as u8)
 }
 
 fn get_first_byte(value: u16) -> u8 {
