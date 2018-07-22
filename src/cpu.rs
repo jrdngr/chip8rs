@@ -25,6 +25,12 @@ extern "C" {
     fn getAnyKey() -> i32;
 }
 
+macro_rules! log {
+    ($($t:tt)*) => {
+        (log(&format!($($t)*)))
+    };
+}
+
 #[wasm_bindgen]
 pub struct Cpu {
     program_counter: usize,
@@ -81,7 +87,9 @@ impl Cpu {
                 self.data_registers[x] = nn; 
             },
             OpCode::AddValue(x, nn) => { 
-                self.data_registers[x] += nn; 
+                let vx = self.data_registers[x];
+                let (sum, _overflowed) = vx.overflowing_add(nn);
+                self.data_registers[x] = sum;
             },
             OpCode::StoreRegister(x, y) => { 
                 self.data_registers[x] = self.data_registers[y]; 
@@ -295,7 +303,7 @@ impl Cpu {
 
     pub fn step(&mut self) {
         let next_op = self.get_current_opcode();
-        log(&format!("{:?}", next_op));
+        log!("{:?}", next_op);
         self.next_op();
     }
 

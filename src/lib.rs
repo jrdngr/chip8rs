@@ -3,7 +3,7 @@
 extern crate wasm_bindgen;
 
 pub mod opcode;
-pub mod hardware;
+pub mod cpu;
 pub mod rng;
 
 #[cfg(test)]
