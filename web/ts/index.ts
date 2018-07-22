@@ -3,11 +3,13 @@ import { Cpu } from "../chip8";
 // @ts-ignore
 import { memory } from "../chip8_bg";
 import { Display } from "./display";
+import { Keyboard } from "./keyboard";
 
 const cpu = Cpu.new();
 
 const canvas = <HTMLCanvasElement>document.getElementById("screen-canvas");
 const display = new Display(64, 32, canvas);
+const keyboard = new Keyboard();
 
 function toArray(ptr: number) {
     return new Uint8Array(memory.buffer, ptr, 16);
@@ -16,13 +18,7 @@ function toArray(ptr: number) {
 document.addEventListener("keydown", function(event) {
     if (event.key == "s") {
         stepCpu();
-    } else {
-        cpu.set_key_down(parseInt(event.key, 16));
     }
-});
-
-document.addEventListener("keyup", function(event) {
-    cpu.set_key_up(parseInt(event.key, 16));
 });
 
 const fileButton = document.getElementById("fileButton");
@@ -49,13 +45,11 @@ const debugTable = {
     sp: cpuTableHeader.insertCell().innerHTML = "SP",
     dt: cpuTableHeader.insertCell().innerHTML = "DT",
     st: cpuTableHeader.insertCell().innerHTML = "ST",
-    kb: cpuTableHeader.insertCell().innerHTML = "KB",
     values: cpuTableValues,
     pcv: cpuTableValues.insertCell(),
     spv: cpuTableValues.insertCell(),
     dtv: cpuTableValues.insertCell(),
     stv: cpuTableValues.insertCell(),
-    kbv: cpuTableValues.insertCell(),
 };
 
 cpuTable.cellPadding = "5";
@@ -117,7 +111,6 @@ function update() {
     debugTable.spv.innerHTML = cpu.stack_pointer().toString();
     debugTable.dtv.innerHTML = cpu.delay_timer().toString();
     debugTable.stv.innerHTML = cpu.sound_timer().toString();
-    debugTable.kbv.innerHTML = cpu.get_keyboard_state().toString();
 
     const registers = toArray(cpu.data_registers());
     const stack = toArray(cpu.stack());
@@ -126,19 +119,20 @@ function update() {
         registerValues[i].innerHTML = registers[i].toString();
         stackValues[i].innerHTML = stack[i].toString();
     }
-
-    setTimeout(update, REFRESH_RATE);
 }
-
-update();
 
 function loop() {
     stepCpu();
+    update();
     requestAnimationFrame(loop);
 }
 
-//requestAnimationFrame(loop);
+requestAnimationFrame(loop);
 
+
+/*
+ *  Export to Rust 
+ */
 
 export function setPixel(x: number, y: number) {
     display.setPixel(x, y);
@@ -146,6 +140,14 @@ export function setPixel(x: number, y: number) {
 
 export function clearScreen() {
     display.clear();
+}
+
+export function isKeyDown(key: number): boolean {
+    return keyboard.isKeyDown(key);
+}
+
+export function getAnyKey(): number {
+    return keyboard.getAnyKey();
 }
 
 const MAX_INT = 2_147_483_647

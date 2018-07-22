@@ -3,6 +3,8 @@ import * as wasm from './chip8_bg';
 import { getRandomSeed } from './js/index';
 import { setPixel } from './js/index';
 import { clearScreen } from './js/index';
+import { isKeyDown } from './js/index';
+import { getAnyKey } from './js/index';
 
 const __wbg_f_log_log_n_target = console.log;
 
@@ -39,6 +41,14 @@ export function __wbg_f_setPixel_setPixel_n(arg0, arg1) {
 
 export function __wbg_f_clearScreen_clearScreen_n() {
     clearScreen();
+}
+
+export function __wbg_f_isKeyDown_isKeyDown_n(arg0) {
+    return isKeyDown(arg0) ? 1 : 0;
+}
+
+export function __wbg_f_getAnyKey_getAnyKey_n() {
+    return getAnyKey();
 }
 
 let cachegetUint64Memory = null;
@@ -106,53 +116,6 @@ stack() {
 }
 ram() {
     return wasm.cpu_ram(this.ptr);
-}
-get_keyboard_state() {
-    return wasm.cpu_get_keyboard_state(this.ptr);
-}
-set_key_down(arg0) {
-    return wasm.cpu_set_key_down(this.ptr, arg0);
-}
-set_key_up(arg0) {
-    return wasm.cpu_set_key_up(this.ptr, arg0);
-}
-}
-
-export class Keyboard {
-
-                static __construct(ptr) {
-                    return new Keyboard(ptr);
-                }
-
-                constructor(ptr) {
-                    this.ptr = ptr;
-                }
-
-            free() {
-                const ptr = this.ptr;
-                this.ptr = 0;
-                wasm.__wbg_keyboard_free(ptr);
-            }
-        static new() {
-    return Keyboard.__construct(wasm.keyboard_new());
-}
-set_key_down(arg0) {
-    return wasm.keyboard_set_key_down(this.ptr, arg0);
-}
-set_key_up(arg0) {
-    return wasm.keyboard_set_key_up(this.ptr, arg0);
-}
-get_key_down(arg0) {
-    return (wasm.keyboard_get_key_down(this.ptr, arg0)) !== 0;
-}
-any_keys_down() {
-    return (wasm.keyboard_any_keys_down(this.ptr)) !== 0;
-}
-last_key_down() {
-    return wasm.keyboard_last_key_down(this.ptr);
-}
-get_state() {
-    return wasm.keyboard_get_state(this.ptr);
 }
 }
 

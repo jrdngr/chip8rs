@@ -1,5 +1,4 @@
 use crate::opcode::{ OpCode };
-use crate::hardware::keyboard::{ Keyboard };
 use crate::rng::{ Rng };
 
 use wasm_bindgen::prelude::*;
@@ -8,14 +7,22 @@ const START_ADDRESS: usize = 512;
 
 #[wasm_bindgen]
 extern "C" {
+    // JavaScript
     #[wasm_bindgen(js_namespace = console)]
     pub fn log(s: &str);
+    // Random
     #[wasm_bindgen(module = "./js/index")]
     fn getRandomSeed() -> i32;
+    // Display
     #[wasm_bindgen(module = "./js/index")]
     fn setPixel(x: u8, y: u8);
     #[wasm_bindgen(module = "./js/index")]
     fn clearScreen();
+    // Keyboard
+    #[wasm_bindgen(module = "./js/index")]
+    fn isKeyDown(x: i32) -> bool;
+    #[wasm_bindgen(module = "./js/index")]
+    fn getAnyKey() -> i32;
 }
 
 #[wasm_bindgen]
@@ -28,7 +35,6 @@ pub struct Cpu {
     data_registers: [u8; 16],
     stack: [usize; 16],
     ram: [u8; 4096],
-    keyboard: Keyboard,
     rng: Rng,
     is_paused: bool,
 }
@@ -159,13 +165,13 @@ impl Cpu {
             },
             OpCode::SkipIfKeyPressed(x) => { 
                 let key = self.data_registers[x]; 
-                if self.keyboard.get_key_down(key) {
+                if isKeyDown(key as i32) {
                     self.program_counter += 2;
                 }
             },
             OpCode::SkipIfKeyNotPressed(x) => { 
                 let key = self.data_registers[x];  
-                if !self.keyboard.get_key_down(key) {
+                if !isKeyDown(key as i32) {
                     self.program_counter += 2;
                 }
             },
@@ -173,8 +179,9 @@ impl Cpu {
                 self.data_registers[x] = self.delay_timer; 
             },
             OpCode::WaitAndStoreKey(x) => { 
-                if self.keyboard.any_keys_down() {
-                    self.data_registers[x] = self.keyboard.last_key_down();
+                let key = getAnyKey();
+                if key > 0 {
+                    self.data_registers[x] = key as u8;
                 } else {
                     self.program_counter -= 2;
                 }
@@ -269,7 +276,6 @@ impl Cpu {
             i_register: 0,
             data_registers: [0; 16],
             stack: [0; 16],
-            keyboard: Keyboard::new(),
             rng: Rng::new(getRandomSeed()),
             is_paused: true,
             ram,
@@ -323,18 +329,6 @@ impl Cpu {
 
     pub fn ram(&self) -> *const u8 {
         self.ram.as_ptr()
-    }
-
-    pub fn get_keyboard_state(&self) -> u16 {
-        self.keyboard.get_state()
-    }
-
-    pub fn set_key_down(&mut self, key: u8) {
-        self.keyboard.set_key_down(key);
-    }
-
-    pub fn set_key_up(&mut self, key: u8) {
-        self.keyboard.set_key_up(key);
     }
 }
 
