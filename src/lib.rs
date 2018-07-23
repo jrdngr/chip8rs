@@ -1,10 +1,7 @@
 #![feature(rust_2018_preview, use_extern_macros, wasm_custom_section, wasm_import_module)]
 
-extern crate wasm_bindgen;
-
-pub mod opcode;
 pub mod cpu;
-pub mod rng;
+pub mod assembler;
 
 #[cfg(test)]
 mod tests {

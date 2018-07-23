@@ -1,5 +1,8 @@
-use crate::opcode::{ OpCode };
-use crate::rng::{ Rng };
+pub mod opcode;
+pub mod rng;
+
+use self::opcode::{ OpCode };
+use self::rng::{ Rng };
 
 use wasm_bindgen::prelude::*;
 
