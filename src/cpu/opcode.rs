@@ -98,6 +98,22 @@ impl From<u16> for OpCode {
     }
 }
 
+impl std::str::FromStr for OpCode {
+    type Err = String;
+
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
+        let mut words = value.split_whitespace();
+        if let Some(code) = words.next() {
+            match code.to_lowercase().as_ref() {
+                "cls" =>  return Ok(OpCode::ClearScreen),
+                "ret" => return Ok(OpCode::ReturnFromSubroutine),
+                _ => return Err(String::from(format!("{} is not a valid instruction", code))),
+            };
+        }
+        Err(String::from("Invalid syntax"))
+    }
+}
+
 fn get_hex_digits(value: u16) -> (u8, usize, usize, u8) {
     (((value & 0xF000) >> 12) as u8, ((value & 0x0F00) >> 8) as usize, ((value & 0x00F0) >> 4) as usize, (value & 0x000F) as u8)
 }
