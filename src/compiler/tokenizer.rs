@@ -1,6 +1,10 @@
+use std::str::FromStr;
+
+use crate::compiler::assembler::Instruction;
+
 #[derive(Debug)]
 pub enum Token {
-    Instruction(String),
+    Instruction(Instruction),
     Register(u8),
     Number(u16),
     Constant,
@@ -8,38 +12,35 @@ pub enum Token {
     LabelReference(String),
 }
 
-pub fn get_token(s: &str) -> Token {
-    match s.to_lowercase().as_ref() {
-        | "cls"
-        | "ret"
-        | "sys"
-        | "jp"
-        | "call"
-        | "se"
-        | "sne"
-        | "ld"
-        | "add"
-        | "or"
-        | "and"
-        | "xor"
-        | "sub"
-        | "shr"
-        | "subn"
-        | "shl"
-        | "rnd"
-        | "drw"
-        | "skp"
-        | "sknp" => Token::Instruction(String::from(s)),
-        "dw" => Token::Constant,
-        s => match s.parse::<u16>() {
-            Ok(n) => Token::Number(n),
-            Err(e) => if s.ends_with(':') {
-                Token::LabelDefinition(String::from(s))
-            } else {
-                Token::LabelReference(String::from(s))
-            }
+pub fn get_token_stream(s: &str) -> Vec<Token> {
+    let mut result = Vec::new();
+    for word in s.split_whitespace() {
+        result.push(get_token(word));
+    }
+
+    result
+}
+
+fn get_token(s: &str) -> Token {
+    if let Ok(instruction) = Instruction::from_str(s) {
+        return Token::Instruction(instruction);
+    }
+
+    if let Ok(n) = s.parse::<u16>() {
+        return Token::Number(n);
+    }
+
+    if s.starts_with('#') {
+        if let Ok(n) = u16::from_str_radix(s.trim_left_matches('#'), 16) {
+            return Token::Number(n);
         }
     }
+
+    if s.ends_with(':') {
+        return Token::LabelDefinition(String::from(s));
+    }
+
+    Token::LabelReference(String::from(s))
 }
 
 #[cfg(test)]
@@ -50,7 +51,8 @@ mod tests {
     use super::*;
     
     #[test]
-    fn test_tokenizer() {
+    #[ignore]
+    fn test_get_token() {
         let mut f = File::open("breakout.src").expect("File not found");
         let mut source = String::new();
         f.read_to_string(&mut source).expect("Error reading file");
@@ -59,6 +61,18 @@ mod tests {
         for word in source.split_whitespace() {
             println!("{:?}", get_token(word));
         }
+    }
 
+    #[test]
+    #[ignore]
+    fn test_get_token_stream() {
+        let mut f = File::open("breakout.src").expect("File not found");
+        let mut source = String::new();
+        f.read_to_string(&mut source).expect("Error reading file");
+        
+        source = crate::compiler::clean_source(&source);
+        let tokens = get_token_stream(&source);
+
+        println!("{:?}", tokens);
     }
 }

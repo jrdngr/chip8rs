@@ -4,6 +4,9 @@ pub mod assembler;
 
 pub fn compile(source: &str) -> Result<Vec<u8>, String> {
     let mut result = Vec::new();
+
+    let tokens = tokenizer::get_token_stream(&clean_source(source));
+
     Ok(result)
 }
 
@@ -15,7 +18,7 @@ fn strip_comments(source: &str) -> String {
     let mut result = String::new();
     for line in source.lines() {
         let mut split_line: Vec<&str> = line.split(';').collect();
-        if split_line.len() > 0 && split_line[0] != "" {
+        if !split_line.is_empty() && split_line[0] != "" {
             result.push_str(split_line[0]);
             result.push('\n');
         }
@@ -36,6 +39,8 @@ mod tests {
         let mut contents = String::new();
         f.read_to_string(&mut contents).expect("Error reading file");
         
-        //println!("{}", strip_comments(&contents));
+        assert_eq!("", strip_comments("; Here be comments!"));
+        assert_eq!("Here be code \n", strip_comments("Here be code ; and comments!"));
+        assert_eq!("JustALabel:\n", strip_comments("JustALabel:"));
     }
 }

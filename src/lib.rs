@@ -5,10 +5,15 @@ pub mod compiler;
 
 #[cfg(test)]
 mod tests {
+    use std::fs::File;
+    use std::io::prelude::*;
     use super::*;
 
     #[test]
+    #[ignore]
     fn template() {
-        assert_eq!(1, 1);
+        let mut f = File::open("breakout.src").expect("File not found");
+        let mut contents = String::new();
+        f.read_to_string(&mut contents).expect("Error reading file");
     }
 }
