@@ -1,6 +1,6 @@
 pub mod tokenizer;
 pub mod parser;
-pub mod assembler;
+pub mod instructions;
 
 pub fn compile(source: &str) -> Result<Vec<u8>, String> {
     let mut result = Vec::new();

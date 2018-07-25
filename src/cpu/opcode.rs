@@ -98,6 +98,48 @@ impl From<u16> for OpCode {
     }
 }
 
+impl From<OpCode> for u16 {
+    fn from(value: OpCode) -> Self {
+        match value {
+            OpCode::ExecuteMachineSubroutine(nnn)   => 0x0000 | nnn as u16,
+            OpCode::ClearScreen                     => 0x00E0,
+            OpCode::ReturnFromSubroutine            => 0x00EE,
+            OpCode::JumpTo(nnn)                     => 0x1000 | nnn as u16,
+            OpCode::ExecuteSubroutine(nnn)          => 0x2000 | nnn as u16,
+            OpCode::SkipIfEqualValue(x, nn)         => 0x3000 | shift_3(x) | nn as u16,
+            OpCode::SkipIfNotEqualValue(x, nn)      => 0x4000 | shift_3(x) | nn as u16,
+            OpCode::SkipIfEqualRegister(x, y)       => 0x5000 | shift_3(x) | shift_2(y),
+            OpCode::StoreValue(x, nn)               => 0x6000 | shift_3(x) | nn as u16,
+            OpCode::AddValue(x, nn)                 => 0x7000 | shift_3(x) | nn as u16,
+            OpCode::StoreRegister(x, y)             => 0x8000 | shift_3(x) | shift_2(y),
+            OpCode::Or(x, y)                        => 0x8000 | shift_3(x) | shift_2(y) | 1,
+            OpCode::And(x, y)                       => 0x8000 | shift_3(x) | shift_2(y) | 2,
+            OpCode::Xor(x, y)                       => 0x8000 | shift_3(x) | shift_2(y) | 3,
+            OpCode::AddRegister(x, y)               => 0x8000 | shift_3(x) | shift_2(y) | 4,
+            OpCode::SubtractRegister(x, y)          => 0x8000 | shift_3(x) | shift_2(y) | 5,
+            OpCode::ShiftRight(x, y)                => 0x8000 | shift_3(x) | shift_2(y) | 6,
+            OpCode::SubtractRegisterReverse(x, y)   => 0x8000 | shift_3(x) | shift_2(y) | 7,
+            OpCode::ShiftLeft(x, y)                 => 0x8000 | shift_3(x) | shift_2(y) | 0xE,
+            OpCode::SkipIfNotEqualRegister(x, y)    => 0x9000 | shift_3(x) | shift_2(y),
+            OpCode::StoreInI(nnn)                   => 0xA000 | nnn as u16,
+            OpCode::JumpWithOffset(nnn)             => 0xB000 | nnn as u16,
+            OpCode::SetToRandom(x, nn)              => 0xC000 | shift_3(x) | nn as u16,
+            OpCode::DrawSprite(x, y, n)             => 0xD000 | shift_3(x) | shift_2(y) | (n as u16),
+            OpCode::SkipIfKeyPressed(x)             => 0xE000 | shift_3(x) | 0x9E,
+            OpCode::SkipIfKeyNotPressed(x)          => 0xE000 | shift_3(x) | 0xA1,
+            OpCode::StoreDelayTimer(x)              => 0xF000 | shift_3(x) | 0x07,
+            OpCode::WaitAndStoreKey(x)              => 0xF000 | shift_3(x) | 0x0A,
+            OpCode::SetDelayTimer(x)                => 0xF000 | shift_3(x) | 0x15,
+            OpCode::SetSoundTimer(x)                => 0xF000 | shift_3(x) | 0x18,
+            OpCode::AddToRegisterI(x)               => 0xF000 | shift_3(x) | 0x1E,
+            OpCode::SetIToHexSprite(x)              => 0xF000 | shift_3(x) | 0x29,
+            OpCode::StoreDecimal(x)                 => 0xF000 | shift_3(x) | 0x33,
+            OpCode::StoreRegisters(x)               => 0xF000 | shift_3(x) | 0x55,
+            OpCode::FillRegisters(x)                => 0xF000 | shift_3(x) | 0x65,
+        }
+    }
+}
+
 fn get_hex_digits(value: u16) -> (u8, usize, usize, u8) {
     (((value & 0xF000) >> 12) as u8, ((value & 0x0F00) >> 8) as usize, ((value & 0x00F0) >> 4) as usize, (value & 0x000F) as u8)
 }
@@ -114,13 +156,21 @@ fn get_last_12_bits(value: u16) -> usize {
     (value & 0x0FFF) as usize
 }
 
+fn shift_3(x: usize) -> u16 {
+    (x as u16) << 8
+}
+
+fn shift_2(y: usize) -> u16 {
+    (y as u16) << 4
+}
+
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
    #[test]
-    fn test_opcodes() {
+    fn test_opcodes_from_u16() {
         assert_eq!(OpCode::from(0x01B3), OpCode::ExecuteMachineSubroutine(0x1B3));
         assert_eq!(OpCode::from(0x00E0), OpCode::ClearScreen);
         assert_eq!(OpCode::from(0x00EE), OpCode::ReturnFromSubroutine);
@@ -156,6 +206,45 @@ mod tests {
         assert_eq!(OpCode::from(0xF133), OpCode::StoreDecimal(1));
         assert_eq!(OpCode::from(0xF155), OpCode::StoreRegisters(1));
         assert_eq!(OpCode::from(0xF165), OpCode::FillRegisters(1));
+    }
+
+    #[test]
+    fn test_u16_from_opcodes() {
+        assert_eq!(0x01B3, u16::from(OpCode::ExecuteMachineSubroutine(0x1B3)));
+        assert_eq!(0x00E0, u16::from(OpCode::ClearScreen));
+        assert_eq!(0x00EE, u16::from(OpCode::ReturnFromSubroutine));
+        assert_eq!(0x23B2, u16::from(OpCode::ExecuteSubroutine(0x3B2)));
+        assert_eq!(0x1123, u16::from(OpCode::JumpTo(0x123)));
+        assert_eq!(0x3123, u16::from(OpCode::SkipIfEqualValue(1, 0x23)));
+        assert_eq!(0x4123, u16::from(OpCode::SkipIfNotEqualValue(1, 0x23)));
+        assert_eq!(0x5120, u16::from(OpCode::SkipIfEqualRegister(1, 2)));
+        assert_eq!(0x6123, u16::from(OpCode::StoreValue(1, 0x23)));
+        assert_eq!(0x7123, u16::from(OpCode::AddValue(1, 0x23)));
+        assert_eq!(0x8120, u16::from(OpCode::StoreRegister(1, 2)));
+        assert_eq!(0x8121, u16::from(OpCode::Or(1, 2)));
+        assert_eq!(0x8122, u16::from(OpCode::And(1, 2)));
+        assert_eq!(0x8123, u16::from(OpCode::Xor(1, 2)));
+        assert_eq!(0x8124, u16::from(OpCode::AddRegister(1, 2)));
+        assert_eq!(0x8125, u16::from(OpCode::SubtractRegister(1, 2)));
+        assert_eq!(0x8126, u16::from(OpCode::ShiftRight(1, 2)));
+        assert_eq!(0x8127, u16::from(OpCode::SubtractRegisterReverse(1, 2)));
+        assert_eq!(0x812E, u16::from(OpCode::ShiftLeft(1, 2)));
+        assert_eq!(0x9120, u16::from(OpCode::SkipIfNotEqualRegister(1, 2)));
+        assert_eq!(0xA123, u16::from(OpCode::StoreInI(0x123)));
+        assert_eq!(0xB123, u16::from(OpCode::JumpWithOffset(0x123)));
+        assert_eq!(0xC123, u16::from(OpCode::SetToRandom(1, 0x23)));
+        assert_eq!(0xD123, u16::from(OpCode::DrawSprite(1, 2, 3)));
+        assert_eq!(0xE19E, u16::from(OpCode::SkipIfKeyPressed(1)));
+        assert_eq!(0xE1A1, u16::from(OpCode::SkipIfKeyNotPressed(1)));
+        assert_eq!(0xF107, u16::from(OpCode::StoreDelayTimer(1)));
+        assert_eq!(0xF10A, u16::from(OpCode::WaitAndStoreKey(1)));
+        assert_eq!(0xF115, u16::from(OpCode::SetDelayTimer(1)));
+        assert_eq!(0xF118, u16::from(OpCode::SetSoundTimer(1)));
+        assert_eq!(0xF11E, u16::from(OpCode::AddToRegisterI(1)));
+        assert_eq!(0xF129, u16::from(OpCode::SetIToHexSprite(1)));
+        assert_eq!(0xF133, u16::from(OpCode::StoreDecimal(1)));
+        assert_eq!(0xF155, u16::from(OpCode::StoreRegisters(1)));
+        assert_eq!(0xF165, u16::from(OpCode::FillRegisters(1)));
     }
 
     #[test]

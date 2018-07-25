@@ -95,8 +95,7 @@ document.body.appendChild(stepButton);
 
 const startButton = document.createElement("button");
 startButton.innerText = "Start";
-startButton.addEventListener("click", () => cpu.start());
-startButton.disabled = true;
+startButton.addEventListener("click", loop);
 document.body.appendChild(startButton);
 
 function stepCpu() {
@@ -126,9 +125,6 @@ function loop() {
     update();
     requestAnimationFrame(loop);
 }
-
-requestAnimationFrame(loop);
-
 
 /*
  *  Export to Rust 

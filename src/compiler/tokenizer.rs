@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use crate::compiler::assembler::Instruction;
+use crate::compiler::instructions::Instruction;
 
 #[derive(Debug)]
 pub enum Token {
