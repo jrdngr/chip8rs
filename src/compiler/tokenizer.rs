@@ -4,12 +4,26 @@ use crate::compiler::instructions::Instruction;
 
 #[derive(Debug)]
 pub enum Token {
-    Instruction(Instruction),
-    Register(u8),
-    Number(u16),
     Constant,
+    Number(u16),
+    Register(u8),
+    Instruction(Instruction),
     LabelDefinition(String),
     LabelReference(String),
+}
+
+impl Token {
+    pub fn is_parameter(&self) -> bool {
+        match self {
+            | Token::Number(_)
+            | Token::Register(_)
+            | Token::LabelReference(_) => true,
+
+            | Token::Constant
+            | Token::Instruction(_)
+            | Token::LabelDefinition(_) => false,
+        }
+    }
 }
 
 pub fn get_token_stream(s: &str) -> Vec<Token> {
