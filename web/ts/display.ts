@@ -21,6 +21,7 @@ export class Display {
     }
 
     public setPixel(x: number, y: number) {
+        console.log(x);
         const index = this.getIndex(x, y);
         const current = this.pixels[index];
         if (!current) {

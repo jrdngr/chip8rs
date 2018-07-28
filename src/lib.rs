@@ -2,6 +2,7 @@
 
 pub mod cpu;
 pub mod compiler;
+pub mod javascript;
 
 #[cfg(test)]
 mod tests {

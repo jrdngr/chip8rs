@@ -1,36 +1,20 @@
 pub mod opcode;
 pub mod rng;
 
+use wasm_bindgen::prelude::*;
+
 use self::opcode::{ OpCode };
 use self::rng::{ Rng };
 
-use wasm_bindgen::prelude::*;
+use crate::javascript;
 
 const START_ADDRESS: usize = 512;
-
-#[wasm_bindgen]
-extern "C" {
-    // JavaScript
-    #[wasm_bindgen(js_namespace = console)]
-    pub fn log(s: &str);
-    // Random
-    #[wasm_bindgen(module = "./js/index")]
-    fn getRandomSeed() -> i32;
-    // Display
-    #[wasm_bindgen(module = "./js/index")]
-    fn setPixel(x: u8, y: u8);
-    #[wasm_bindgen(module = "./js/index")]
-    fn clearScreen();
-    // Keyboard
-    #[wasm_bindgen(module = "./js/index")]
-    fn isKeyDown(x: i32) -> bool;
-    #[wasm_bindgen(module = "./js/index")]
-    fn getAnyKey() -> i32;
-}
+const INSTRUCTIONS_PER_SECOND: u32 = 500;
+const FRAME_DURATION_MS: u32 = 500;  //1000 / INSTRUCTIONS_PER_SECOND;
 
 macro_rules! log {
     ($($t:tt)*) => {
-        (log(&format!($($t)*)))
+        (javascript::log(&format!($($t)*)))
     };
 }
 
@@ -46,6 +30,7 @@ pub struct Cpu {
     ram: [u8; 4096],
     rng: Rng,
     is_paused: bool,
+    last_frame: u32,
 }
 
 impl Cpu {
@@ -53,7 +38,7 @@ impl Cpu {
         match opcode {
             OpCode::ExecuteMachineSubroutine(nnn) => { /* Not implemented */ },
             OpCode::ClearScreen => {   
-                clearScreen();
+                javascript::clearScreen();
             },
             OpCode::ReturnFromSubroutine => {   
                 self.stack_pointer -= 1;
@@ -169,20 +154,20 @@ impl Cpu {
                     let bits = Cpu::get_bits(byte);
                     for x_offset in 0..bits.len() as u8 {
                         if bits[x_offset as usize] {
-                            setPixel(vx + x_offset, vy + y_offset);
+                            javascript::setPixel(vx + x_offset, vy + y_offset);
                         }
                     }
                 }
             },
             OpCode::SkipIfKeyPressed(x) => { 
                 let key = self.data_registers[x]; 
-                if isKeyDown(key as i32) {
+                if javascript::isKeyDown(key as i32) {
                     self.program_counter += 2;
                 }
             },
             OpCode::SkipIfKeyNotPressed(x) => { 
                 let key = self.data_registers[x];  
-                if !isKeyDown(key as i32) {
+                if !javascript::isKeyDown(key as i32) {
                     self.program_counter += 2;
                 }
             },
@@ -190,7 +175,7 @@ impl Cpu {
                 self.data_registers[x] = self.delay_timer; 
             },
             OpCode::WaitAndStoreKey(x) => { 
-                let key = getAnyKey();
+                let key = javascript::getAnyKey();
                 if key > 0 {
                     self.data_registers[x] = key as u8;
                 } else {
@@ -278,7 +263,7 @@ impl Cpu {
         for (index, byte) in HEX_SPRITES.iter().enumerate() {
             ram[index] = *byte;
         }
-     
+
         Cpu {
             program_counter: START_ADDRESS,
             stack_pointer: 0,
@@ -287,9 +272,10 @@ impl Cpu {
             i_register: 0,
             data_registers: [0; 16],
             stack: [0; 16],
-            rng: Rng::new(getRandomSeed()),
+            rng: Rng::new(javascript::getRandomSeed()),
             is_paused: true,
             ram,
+            last_frame: javascript::now(),
         }
     }
 
@@ -300,13 +286,17 @@ impl Cpu {
     pub fn start(&mut self) {
         let max = self.ram.len() - 1;
         while self.program_counter < max {
-            self.next_op();
+            let now = javascript::now();
+            if (now - self.last_frame > FRAME_DURATION_MS) {
+                self.next_op();
+                self.last_frame = now; 
+            }
         }
     }
 
     pub fn step(&mut self) {
         let next_op = self.get_current_opcode();
-        log!("{:?}", next_op);
+        //log!("{:?}", next_op);
         self.next_op();
     }
 

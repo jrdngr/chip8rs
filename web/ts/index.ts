@@ -95,13 +95,12 @@ document.body.appendChild(stepButton);
 
 const startButton = document.createElement("button");
 startButton.innerText = "Start";
-startButton.addEventListener("click", loop);
+startButton.addEventListener("click", startCpu);
 document.body.appendChild(startButton);
 
 function stepCpu() {
     cpu.step();
 }
-
 
 const REFRESH_RATE = 100;
 
@@ -118,6 +117,10 @@ function update() {
         registerValues[i].innerHTML = registers[i].toString();
         stackValues[i].innerHTML = stack[i].toString();
     }
+}
+
+function startCpu() {
+    cpu.start();
 }
 
 function loop() {
