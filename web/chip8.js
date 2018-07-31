@@ -20,6 +20,23 @@ function passArray8ToWasm(arg) {
     return [ptr, arg.length];
 }
 
+const __wbg_log_78be5f70610a4c3a_target = console.log;
+
+const TextDecoder = typeof self === 'object' && self.TextDecoder
+    ? self.TextDecoder
+    : require('util').TextDecoder;
+
+let cachedDecoder = new TextDecoder('utf-8');
+
+function getStringFromWasm(ptr, len) {
+    return cachedDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
+}
+
+export function __wbg_log_78be5f70610a4c3a(arg0, arg1) {
+    let varg0 = getStringFromWasm(arg0, arg1);
+    __wbg_log_78be5f70610a4c3a_target(varg0);
+}
+
 const __wbg_now_d79247c5b9feb298_target = Date.now;
 
 export function __wbg_now_d79247c5b9feb298() {
@@ -176,16 +193,6 @@ export class Cpu {
         }
         return wasm.cpu_ram(this.ptr);
     }
-}
-
-const TextDecoder = typeof self === 'object' && self.TextDecoder
-    ? self.TextDecoder
-    : require('util').TextDecoder;
-
-let cachedDecoder = new TextDecoder('utf-8');
-
-function getStringFromWasm(ptr, len) {
-    return cachedDecoder.decode(getUint8Memory().subarray(ptr, ptr + len));
 }
 
 export function __wbindgen_throw(ptr, len) {

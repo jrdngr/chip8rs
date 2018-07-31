@@ -296,7 +296,7 @@ impl Cpu {
 
     pub fn step(&mut self) {
         let next_op = self.get_current_opcode();
-        //log!("{:?}", next_op);
+        log!("{:?}", next_op);
         self.next_op();
     }
 

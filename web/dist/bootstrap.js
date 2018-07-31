@@ -55,9 +55,6 @@
 /******/ 		"./chip8_bg.wasm": function() {
 /******/ 			return {
 /******/ 				"./chip8": {
-/******/ 					"__wbg_log_78be5f70610a4c3a": function(p0i32,p1i32) {
-/******/ 						return installedModules["./chip8.js"].exports["__wbg_log_78be5f70610a4c3a"](p0i32,p1i32);
-/******/ 					},
 /******/ 					"__wbg_now_d79247c5b9feb298": function() {
 /******/ 						return installedModules["./chip8.js"].exports["__wbg_now_d79247c5b9feb298"]();
 /******/ 					},
@@ -178,7 +175,7 @@
 /******/ 				promises.push(installedWasmModuleData);
 /******/ 			else {
 /******/ 				var importObject = wasmImportObjects[wasmModuleId]();
-/******/ 				var req = fetch(__webpack_require__.p + "" + {"./chip8_bg.wasm":"77714054af9fabdc43f5"}[wasmModuleId] + ".module.wasm");
+/******/ 				var req = fetch(__webpack_require__.p + "" + {"./chip8_bg.wasm":"bb1ee390dfd4dee8cc90"}[wasmModuleId] + ".module.wasm");
 /******/ 				var promise;
 /******/ 				if(importObject instanceof Promise && typeof WebAssembly.compileStreaming === 'function') {
 /******/ 					promise = Promise.all([WebAssembly.compileStreaming(req), importObject]).then(function(items) {

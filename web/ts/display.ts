@@ -1,19 +1,26 @@
+import * as PIXI from 'pixi.js';
+
 const PIXEL_SIZE = 15;
-const PIXEL_ON_COLOR = "#000000";
-const PIXEL_OFF_COLOR = "#FFFFFF";
+const PIXEL_ON_COLOR = 0x000000;
+const PIXEL_OFF_COLOR = 0xFFFFFF;
 
 export class Display {
-    
+    private readonly width: number;
+    private readonly height: number;
     private readonly pixels: boolean[] = [];
-    private readonly ctx: CanvasRenderingContext2D;
     
-    constructor(private readonly width: number, 
-                private readonly height: number, 
-                canvas: HTMLCanvasElement)
+    private readonly app: PIXI.Application;
+
+    constructor(width: number, height: number)
     {
-        this.ctx = canvas.getContext('2d');
-        canvas.width = PIXEL_SIZE * width;
-        canvas.height = PIXEL_SIZE * height;
+        this.width = PIXEL_SIZE * width;
+        this.height = PIXEL_SIZE * height;
+
+        this.app = new PIXI.Application(
+            { backgroundColor: 0xFFFFFF, }
+        );
+        const screenDiv = document.getElementById("screen");
+        screenDiv.appendChild(this.app.view);
 
         for (let i = 0, max = width * height; i < max; i++) {
             this.pixels.push(false);
@@ -21,7 +28,6 @@ export class Display {
     }
 
     public setPixel(x: number, y: number) {
-        console.log(x);
         const index = this.getIndex(x, y);
         const current = this.pixels[index];
         if (!current) {
@@ -44,17 +50,11 @@ export class Display {
     }
 
     private drawPixel(x: number, y: number, isOn: boolean) {
-        this.ctx.beginPath();
-        this.ctx.fillStyle = isOn
-            ? PIXEL_ON_COLOR
-            : PIXEL_OFF_COLOR;
-    
-        this.ctx.fillRect(
-            x * PIXEL_SIZE,
-            y * PIXEL_SIZE,
-            PIXEL_SIZE,
-            PIXEL_SIZE
-        );
+        let rectangle = new PIXI.Graphics();
+        rectangle.beginFill(isOn ? PIXEL_ON_COLOR : PIXEL_OFF_COLOR);
+        rectangle.drawRect(x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
+        rectangle.endFill();
+        this.app.stage.addChild(rectangle);
     }
 
     private getIndex(x: number, y: number): number {

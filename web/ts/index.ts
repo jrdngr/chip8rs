@@ -7,8 +7,7 @@ import { Keyboard } from "./keyboard";
 
 const cpu = Cpu.new();
 
-const canvas = <HTMLCanvasElement>document.getElementById("screen-canvas");
-const display = new Display(64, 32, canvas);
+const display = new Display(64, 32);
 const keyboard = new Keyboard();
 
 function toArray(ptr: number) {
