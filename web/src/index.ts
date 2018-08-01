@@ -1,9 +1,19 @@
-// @ts-ignore
 import { Cpu } from "../chip8";
 // @ts-ignore
 import { memory } from "../chip8_bg";
 import { Display } from "./display";
 import { Keyboard } from "./keyboard";
+
+// // App.ts
+// import Worker from "worker-loader!./cpu.worker";
+
+// const worker = new Worker();
+
+// worker.postMessage({ a: 1 });
+// worker.onmessage = (event) => {};
+
+// worker.addEventListener("message", (event) => {});
+
 
 const cpu = Cpu.new();
 
@@ -118,8 +128,8 @@ function update() {
     }
 }
 
-function startCpu() {
-    cpu.start();
+async function startCpu() {
+    await cpu.start();
 }
 
 function loop() {
@@ -148,7 +158,6 @@ export function getAnyKey(): number {
     return keyboard.getAnyKey();
 }
 
-const MAX_INT = 2_147_483_647
 export function getRandomSeed() {
-    return Math.floor(Math.random() * MAX_INT);
+    return Math.floor(Math.random() * 2_147_483_647);
 }
