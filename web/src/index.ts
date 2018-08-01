@@ -5,15 +5,14 @@ import { Display } from "./display";
 import { Keyboard } from "./keyboard";
 
 // // App.ts
-// import Worker from "worker-loader!./cpu.worker";
+import Worker from "worker-loader!./cpu.worker";
 
-// const worker = new Worker();
+const worker = new Worker();
 
-// worker.postMessage({ a: 1 });
-// worker.onmessage = (event) => {};
+worker.onmessage = (event) => {};
+worker.addEventListener("message", (event) => {console.log(event)});
 
-// worker.addEventListener("message", (event) => {});
-
+worker.postMessage({ a: 1 });
 
 const cpu = Cpu.new();
 

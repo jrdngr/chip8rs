@@ -9,8 +9,7 @@ use self::rng::{ Rng };
 use crate::javascript;
 
 const START_ADDRESS: usize = 512;
-const INSTRUCTIONS_PER_SECOND: u32 = 500;
-const FRAME_DURATION_MS: u32 = 500;  //1000 / INSTRUCTIONS_PER_SECOND;
+const TIMER_RATE: u32 = 1000 / 60;
 
 macro_rules! log {
     ($($t:tt)*) => {
@@ -30,7 +29,7 @@ pub struct Cpu {
     ram: [u8; 4096],
     rng: Rng,
     is_paused: bool,
-    last_frame: u32,
+    last_timer_tick: u32,
 }
 
 impl Cpu {
@@ -228,8 +227,12 @@ impl Cpu {
         let next_op = self.get_current_opcode();
         self.process_opcode(next_op);
         self.program_counter += 2;
-        if self.delay_timer > 0 { self.delay_timer -= 1 };
-        if self.sound_timer > 0 { self.sound_timer -= 1 };
+        let now = javascript::now();
+        if (now - self.last_timer_tick > TIMER_RATE) {
+            if self.delay_timer > 0 { self.delay_timer -= 1 };
+            if self.sound_timer > 0 { self.sound_timer -= 1 };
+            self.last_timer_tick = now; 
+        }
     }
     
     fn get_current_opcode(&self) -> OpCode {
@@ -275,7 +278,7 @@ impl Cpu {
             rng: Rng::new(javascript::getRandomSeed()),
             is_paused: true,
             ram,
-            last_frame: javascript::now(),
+            last_timer_tick: javascript::now(),
         }
     }
 
@@ -286,11 +289,7 @@ impl Cpu {
     pub fn start(&mut self) {
         let max = self.ram.len() - 1;
         while self.program_counter < max {
-            let now = javascript::now();
-            if (now - self.last_frame > FRAME_DURATION_MS) {
-                self.next_op();
-                self.last_frame = now; 
-            }
+            self.next_op();
         }
     }
 

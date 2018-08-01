@@ -3,10 +3,7 @@ import { Cpu } from "../chip8";
 // Worker.ts
 const ctx: Worker = self as any;
 
-// Post data to parent thread
-ctx.postMessage({ foo: "foo" });
-
 // Respond to message from parent thread
-ctx.addEventListener("message", (event) => console.log(event));
+ctx.addEventListener("message", (event) => ctx.postMessage({ foo: "foo" }));
 
 //const cpu = Cpu.new();
