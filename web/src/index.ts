@@ -128,7 +128,8 @@ function update() {
 }
 
 async function startCpu() {
-    await cpu.start();
+    //await cpu.start();
+    loop();
 }
 
 function loop() {
